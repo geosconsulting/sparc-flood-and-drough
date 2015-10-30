@@ -2,6 +2,7 @@ __author__ = 'fabio.lana'
 from urllib2 import Request, urlopen
 import json
 import pandas as pd
+import numpy as np
 from sqlalchemy import create_engine, MetaData
 import csv
 import os
@@ -11,6 +12,8 @@ from geopy.geocoders import Nominatim
 from geopy.geocoders import GeoNames
 import shapefile
 import matplotlib.pylab as plt
+import matplotlib
+matplotlib.style.use('ggplot')
 from shapely.geometry import Point, box
 from osgeo import ogr
 import wx
@@ -288,10 +291,13 @@ class DataAnalysisHistoricalEMDAT(object):
     def plottaggi(self):
 
         self.df['inizio'] = pd.to_datetime(self.df['start_date'])
+        self.df['anno_inizio'] = pd.DatetimeIndex(self.df['inizio']).year
         self.df['mese_inizio'] = pd.DatetimeIndex(self.df['inizio']).month
         self.df['fine'] = pd.to_datetime(self.df['end_date'])
+        self.df['anno_fine'] = pd.DatetimeIndex(self.df['fine']).year
         self.df['mese_fine'] = pd.DatetimeIndex(self.df['fine']).month
         self.df['durata'] = abs(self.df['fine'] - self.df['inizio'])
+        self.df['days'] = self.df['durata'] / np.timedelta64(1, 'D')
 
         data_minima = min(self.df['inizio'])
         data_massima = max(self.df['inizio'])
@@ -307,7 +313,18 @@ class DataAnalysisHistoricalEMDAT(object):
         quanti_per_mese.plot(grid=True,kind='bar',title = 'Frequency of Events by Month ' + str(paese.name) + " between " + str(data_minima.year) + " and " + str(data_massima.year),table=False)
         plt.show()
 
-paese = pycountry.countries.get(name = 'Madagascar')
+        df_duration_more_than_1_day = self.df[self.df['days']> 0 ]
+        df_duration_more_than_1_day_grp_year = df_duration_more_than_1_day.groupby([df_duration_more_than_1_day.index,'anno_inizio']).days.sum()
+        df_duration_more_than_1_day_grp_year.plot(kind='bar', title = 'Summed Days of Storms by Year ' +
+                                                                      str(paese.name) + " between " + str(data_minima.year) + " and "
+                                                                      + str(data_massima.year), x= "Days")
+        plt.xticks(rotation=20)
+        plt.show()
+
+
+#paese = pycountry.countries.get(name = 'Korea Dem P Rep')
+
+paese= pycountry.countries.get(alpha3 = 'CUB')
 
 iso = paese.alpha3
 nome_paese = paese.name
@@ -336,7 +353,7 @@ locazioni_da_inviare_alla_geocodifica = {}
 indice_esterno = 1
 for indice, locazione in locazioni_singole.iteritems():
     if locazione is not None and len(locazione)>0:
-        print indice
+        # print indice
         # print locazione
         chiave = str(indice) + "-" + str(indice_esterno)
         if ';' not in locazione:
@@ -347,12 +364,13 @@ for indice, locazione in locazioni_singole.iteritems():
              for indice_annidato in range(0, len(locazione_annidata)):
                 locazioni_da_inviare_alla_geocodifica[chiave] = str(locazione_annidata[indice_annidato]).strip()
                 indice_esterno += 1
-print "Si dovrebbero inviare %d richieste" % indice_esterno
-geocodiamo = GeocodeEMDAT(nome_paese, 'Storm')
-geocodiamo.geolocate_accidents(locazioni_da_inviare_alla_geocodifica)
-geocodiamo.extract_country_shp()
-geocodiamo.calc_poligono_controllo()
 
-#FASE SHAPEFILE CREATION
-shapiamo = CreateGeocodedShp(nome_paese,'Storm')
-shapiamo.creazione_file_shp()
+print "Si dovrebbero inviare %d richieste" % indice_esterno
+# geocodiamo = GeocodeEMDAT(nome_paese, 'Storm')
+# geocodiamo.geolocate_accidents(locazioni_da_inviare_alla_geocodifica)
+# geocodiamo.extract_country_shp()
+# geocodiamo.calc_poligono_controllo()
+#
+# #FASE SHAPEFILE CREATION
+# shapiamo = CreateGeocodedShp(nome_paese,'Storm')
+# shapiamo.creazione_file_shp()

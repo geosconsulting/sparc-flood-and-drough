@@ -165,8 +165,8 @@ def prepare_insert_statements_drought_monthly_values(paese, adms, dct_values_ann
         return lista, dct_all_admin_values,inserimento_mensili
 
 # paese = 'Benin'
-# proj_dir = "c:/data/tools/sparc/projects/drought/"
-# dirOutPaese = proj_dir + paese
+# PROJ_DIR = "c:/data/tools/sparc/projects/drought/"
+# dirOutPaese = PROJ_DIR + paese
 #
 # raccogli_da_files_anno = collect_drought_poplation_frequencies_frm_dbfs(dirOutPaese)
 # adms=set()

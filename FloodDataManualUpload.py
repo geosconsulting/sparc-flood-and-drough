@@ -210,8 +210,8 @@ def process_dict_with_annual_values(paese, adms, dct_valori_inondazione_annuale,
         return lista, dct_valori_amministrativi, lista_comandi
 
 # paese = 'Benin'
-# proj_dir = "c:/data/tools/sparc/projects/floods/"
-# dirOutPaese = proj_dir + paese
+# PROJ_DIR = "c:/data/tools/sparc/projects/floods/"
+# dirOutPaese = PROJ_DIR + paese
 # fillolo = dirOutPaese + "/" + paese + ".txt"
 #
 # raccogli_da_files_anno = collect_annual_data_byRP_from_dbf_country(dirOutPaese)
