@@ -324,7 +324,7 @@ class DataAnalysisHistoricalEMDAT(object):
 
 #paese = pycountry.countries.get(name = 'Korea Dem P Rep')
 
-paese= pycountry.countries.get(alpha3 = 'CUB')
+paese= pycountry.countries.get(alpha3 = 'YEM')
 
 iso = paese.alpha3
 nome_paese = paese.name

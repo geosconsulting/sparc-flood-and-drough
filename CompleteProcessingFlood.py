@@ -86,6 +86,7 @@ class Progetto(object):
         self.reliability_value = ""
 
     def lista_admin0(self):
+
         numFeatures = self.layer.GetFeatureCount()
         lista_stati = []
         for featureNum in range(numFeatures):
