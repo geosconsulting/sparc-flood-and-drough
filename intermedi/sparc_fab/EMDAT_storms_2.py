@@ -16,7 +16,7 @@ import matplotlib
 matplotlib.style.use('ggplot')
 from shapely.geometry import Point, box
 from osgeo import ogr
-import wx
+
 ogr.UseExceptions()
 
 class ScrapingEMDAT(object):
@@ -321,11 +321,9 @@ class DataAnalysisHistoricalEMDAT(object):
         plt.xticks(rotation=20)
         plt.show()
 
+# paese = pycountry.countries.get(name = 'Korea Dem P Rep')
 
-#paese = pycountry.countries.get(name = 'Korea Dem P Rep')
-
-paese= pycountry.countries.get(alpha3 = 'YEM')
-
+paese= pycountry.countries.get(alpha3 = 'PHL')
 iso = paese.alpha3
 nome_paese = paese.name
 
@@ -349,23 +347,23 @@ visual_interpretation = DataAnalysisHistoricalEMDAT(df_valori_letti)
 visual_interpretation.plottaggi()
 
 #FASE GEOCODING
-locazioni_da_inviare_alla_geocodifica = {}
-indice_esterno = 1
-for indice, locazione in locazioni_singole.iteritems():
-    if locazione is not None and len(locazione)>0:
-        # print indice
-        # print locazione
-        chiave = str(indice) + "-" + str(indice_esterno)
-        if ';' not in locazione:
-            locazioni_da_inviare_alla_geocodifica[chiave] = str(locazione).strip()
-            indice_esterno += 1
-        else:
-             locazione_annidata = locazione.split(";")
-             for indice_annidato in range(0, len(locazione_annidata)):
-                locazioni_da_inviare_alla_geocodifica[chiave] = str(locazione_annidata[indice_annidato]).strip()
-                indice_esterno += 1
+# locazioni_da_inviare_alla_geocodifica = {}
+# indice_esterno = 1
+# for indice, locazione in locazioni_singole.iteritems():
+#     if locazione is not None and len(locazione)>0:
+#         # print indice
+#         # print locazione
+#         chiave = str(indice) + "-" + str(indice_esterno)
+#         if ';' not in locazione:
+#             locazioni_da_inviare_alla_geocodifica[chiave] = str(locazione).strip()
+#             indice_esterno += 1
+#         else:
+#              locazione_annidata = locazione.split(";")
+#              for indice_annidato in range(0, len(locazione_annidata)):
+#                 locazioni_da_inviare_alla_geocodifica[chiave] = str(locazione_annidata[indice_annidato]).strip()
+#                 indice_esterno += 1
 
-print "Si dovrebbero inviare %d richieste" % indice_esterno
+# print "Si dovrebbero inviare %d richieste" % indice_esterno
 # geocodiamo = GeocodeEMDAT(nome_paese, 'Storm')
 # geocodiamo.geolocate_accidents(locazioni_da_inviare_alla_geocodifica)
 # geocodiamo.extract_country_shp()

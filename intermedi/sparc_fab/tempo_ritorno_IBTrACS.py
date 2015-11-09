@@ -2,11 +2,8 @@
 import os
 from osgeo import ogr
 ogr.UseExceptions()
-import glob
 import pycountry
-import pandas as pd
-from mpl_toolkits.basemap import Basemap
-import matplotlib.pyplot as plt
+from math import floor
 
 # COSTANTI
 PROJ_DIR = "c:/sparc/projects/cyclones/"
@@ -26,7 +23,7 @@ FIELD_ISO_ADMIN2 = "ADM2_CODE"
 filter_field_adm2 = "ADM0_NAME,ADM0_CODE,ADM1_NAME,ADM1_CODE,ADM2_NAME,ADM2_CODE"
 filter_field_cyclones = "gid,ev_id,iso3_year,year,start_date,wind,pressure,other_name,serial_num"
 
-def file_structure_creation(paese, admin_name, adm_code):
+def file_structure_creation(paese, admin_name, adm_code,contatore):
 
         os.chdir(PROJ_DIR)
         country_low = str(paese).lower()
@@ -48,8 +45,16 @@ def file_structure_creation(paese, admin_name, adm_code):
             else:
                 os.mkdir(admin_low.replace("\n", ""))
 
-        print "Struttura creata per %s " % admin_low
-        return admin_low
+        file_calcoli = PROJ_DIR + paese + "/" + paese + ".txt"
+        if contatore == 1:
+            if os.path.exists(file_calcoli):
+                os.remove(file_calcoli)
+            probability_list = open(PROJ_DIR + paese + "/" + paese + ".txt", "a")
+            probability_list.write("id,num_tracks,min_year,max_year,rp,prob\n")
+        else:
+            probability_list = open(PROJ_DIR + paese + "/" + paese + ".txt", "a")
+
+        return admin_low, probability_list
 
 def extract_admin(shape_countries_pass, paese, adm_dir, code_adm):
 
@@ -64,7 +69,7 @@ def extract_admin(shape_countries_pass, paese, adm_dir, code_adm):
     conteggio_admin = layer_admins.GetFeatureCount()
 
     # Create the output LayerS
-    outShapefile = os.path.join(PROJ_DIR + paese + "/" + str(adm_dir).lower() + "_" + code_adm + "/" + code_adm + ".shp")
+    outShapefile = os.path.join(PROJ_DIR + paese + "/" + str(adm_dir).lower() + "/" + code_adm + ".shp")
 
     # Remove output shapefile if it already exists
     if os.path.exists(outShapefile):
@@ -108,7 +113,7 @@ def extract_admin(shape_countries_pass, paese, adm_dir, code_adm):
         # Add new feature to output Layer
         out_layer.CreateFeature(outFeature)
 
-        print "Admin %s extracted" % code_adm
+        # print "Admin %s extracted" % code_adm
 
     # Close DataSources
     inDataSource.Destroy()
@@ -118,31 +123,24 @@ def extract_admin(shape_countries_pass, paese, adm_dir, code_adm):
 
 def extract_cyclones(shape_tracks_name, paese, adm_dir, code_adm):
 
-
     # path_admin_exctracted = PROJ_DIR + adm + ".shp"
-    path_admin_exctracted = PROJ_DIR + paese + "/" + str(adm_dir).lower() + "_" + code_adm + "/" + code_adm + ".shp"
-    print path_admin_exctracted
+    path_admin_exctracted = PROJ_DIR + paese + "/" + str(adm_dir).lower() + "/" + code_adm + ".shp"
     shapefile_adm = DRIVER.Open(path_admin_exctracted)
     layer_admins = shapefile_adm.GetLayer()
 
     poly_adm2 = layer_admins.GetNextFeature()
     poly = poly_adm2.GetGeometryRef()
 
-    # shapefile_tracce = DRIVER.Open(shape_tracks_name)
-    # layer_tracks = shapefile_tracce.GetLayer()
-    # layer_tracks.SetSpatialFilter(poly)
-    # numero_tracce_selezionate = layer_tracks.GetFeatureCount()
-
     # Get the input Layer
     inDriver = DRIVER
     inDataSource = inDriver.Open(shape_tracks_name, 0)
     inLayer = inDataSource.GetLayer()
     inLayer.SetSpatialFilter(poly)
-    print "There are %d tracks selected" % (inLayer.GetFeatureCount())
+    num_tracce_instersect = inLayer.GetFeatureCount()
     inLayerProj = inLayer.GetSpatialRef()
 
     # outShapefile = os.path.join(PROJ_DIR + str(code) + "_cy.shp")
-    outShapefile = os.path.join(PROJ_DIR + paese + "/" + str(adm_dir).lower() + "_" + code_adm + "/" + code_adm + "_cy.shp")
+    outShapefile = os.path.join(PROJ_DIR + paese + "/" + str(adm_dir).lower() + "/" + code_adm + "_cy.shp")
     outDriver = DRIVER
     # Remove output shapefile if it already exists
     if os.path.exists(outShapefile):
@@ -190,7 +188,7 @@ def extract_cyclones(shape_tracks_name, paese, adm_dir, code_adm):
     inDataSource.Destroy()
     outDataSource.Destroy()
 
-    return outShapefile
+    return outShapefile, num_tracce_instersect
 
 def tempo_ritorno(tracce_estratte):
 
@@ -224,14 +222,11 @@ def tempo_ritorno(tracce_estratte):
 
     return dict_anni, float(sum_rps), float(num_evts-2)
 
-from math import floor
-
 def floored_percentage(val, digits):
     val *= 10 ** (digits + 2)
     return '{1:.{0}f}%'.format(digits, floor(val) / 10 ** digits)
 
-
-def lista_admin2(nome_zozzo):
+def pulisci_admin2(nome_zozzo):
 
     import re,unicodedata
 
@@ -247,35 +242,59 @@ def lista_admin2(nome_zozzo):
 
 def iterare_sul_paese(iso3):
 
-    paese = pycountry.countries.get(alpha3 = 'MDG')
+    paese = pycountry.countries.get(alpha3 = iso3)
     iso = paese.alpha3
     nome_paese = paese.name
 
     dataSource = DRIVER.Open(SHAPE_COUNTRIES, 0)
-    layer = dataSource.GetLayer()
-
-    for feature in layer:
+    inLayer = dataSource.GetLayer()
+    inLayerProj = inLayer.GetSpatialRef()
+    string_filtro = "iso3='" + str(iso) + "'"
+    inLayer.SetAttributeFilter(string_filtro)
+    conteggio_admin = inLayer.GetFeatureCount()
+    print "There are %d administrative areas in %s "  % (conteggio_admin,nome_paese)
+    contatore = 1
+    for feature in inLayer:
         nome = feature.GetField("ADM2_NAME")
         codice = feature.GetField("ADM2_CODE")
-        nome_da_usare = lista_admin2(nome)
-        # print nome,nome_da_usare
-        dir_adm = file_structure_creation(nome_paese, nome_da_usare, codice)
+        nome_da_usare = pulisci_admin2(nome)
 
-        extract_admin(SHAPE_COUNTRIES, nome_paese, nome_da_usare, str(codice))
-        tracce_estratte = extract_cyclones(SHAPE_TRACKS,nome_paese, nome_da_usare, str(codice))
+        dir_adm, probability_list = file_structure_creation(nome_paese, nome_da_usare, codice, contatore)
+        parti_admin_dir = dir_adm.split("_")
+        num_ = len(parti_admin_dir)
+        # print num_
+        code_adm = parti_admin_dir[num_-1]
+
+        extract_admin(SHAPE_COUNTRIES, nome_paese, dir_adm,code_adm)
+        tracce_estratte, num_tracce = extract_cyclones(SHAPE_TRACKS, nome_paese, dir_adm, code_adm)
         # nome_shp = tracce_estratte.split("/")[4].split(".shp")[0]
         # print nome_shp
         # nome_senza_shp = tracce_estratte.split(".shp")[0]
         # print nome_senza_shp
         # path_shp = tracce_estratte.split(nome_shp)[0]
         # print path_shp
-        # lista_anni,somma_anni,numero_eventi = tempo_ritorno(tracce_estratte)
-        # rp = float(somma_anni/numero_eventi)
-        # prob = floored_percentage(1.00/rp, 0)
-        # print "Return period %.2f with annual probability of %s" % (rp, prob)
+        lista_anni, somma_anni, numero_eventi = tempo_ritorno(tracce_estratte)
+        print lista_anni
+        if numero_eventi > 0:
+            rp = float(somma_anni/numero_eventi)
+            prob = 1.00/rp
+            min_anno = min(lista_anni.values())
+            max_anno = max(lista_anni.values())
+            print "Return period %.2f with annual probability of %s" % (rp, floored_percentage(1.00/rp, 0))
+        else:
+            rp = 99999
+            prob = 99999
+            min_anno = 99999
+            max_anno = 99999
+
+        stringa_di_scrittura = code_adm + "," + str(num_tracce) + "," + str(min_anno) + "," + str(max_anno) + "," + str(rp) + "," + str(prob) + "\n"
+        probability_list.write(stringa_di_scrittura)
+
+        contatore += 1
+
+    probability_list.close()
 
     # os.chdir(CYLONES_RECLASSED_DIR)
     # category_reclass_yearly_tifs = glob.glob("*.tif")
 
-
-iterare_sul_paese('PHL')
+iterare_sul_paese('MWI')
