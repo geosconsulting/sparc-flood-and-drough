@@ -11,7 +11,6 @@ env.overwriteOutput = "true"
 import os
 import glob
 import pycountry
-import unittest
 
 class ProjectStorms(object):
 
@@ -72,7 +71,8 @@ class ProjectStorms(object):
         self.storms_tifs_dir = "C:/sparc/input_data/gar_cyc_15_rcl"
 
         os.chdir(self.storms_tifs_dir)
-        self.storms_tifs = glob.glob("*.tif")
+        self.storms_tifs = glob.glob("*_rsmpl.tif")
+        self.storms_tifs_sorted = sorted(self.storms_tifs, key=lambda x: int(x.split('_')[1]))
 
 
     def rasterstats_statistics(self,admin_vect_file):
@@ -85,37 +85,35 @@ class ProjectStorms(object):
 
     def cut_rasters_storms(self, paese, admin_name, adm_code, adm2_vector):
 
-        #CUT and SAVE Population and Drought Month/Season for each admin2 area
+        #CUT and SAVE Population and Storms for each admin2 area
+        pop_raster = arcpy.Raster(self.population_raster)
+        desc_raster = arcpy.Describe(pop_raster)
+        # print "Band Count:       %d" % desc_raster.bandCount
+        # print "Compression Type: %s" % desc_raster.compressionType
+        # print "Raster Format:    %s" % desc_raster.format
         if self.population_raster != "None":
-            self.lscan_cut_adm2 = self.proj_dir + "/" + paese + "/" + admin_name + "_" + adm_code + "/" + adm_code + "_pop.tif"
             try:
-                arcpy.gp.ExtractByMask_sa(self.population_raster, adm2_vector.name, adm_code)
-                for raster in self.storms_tifs:
-                    storm_adm2_out = self.proj_dir + "/" + paese + "/" + admin_name + "_" + adm_code + "/" + adm_code + "_" + raster.split('_')[1]
+                pop_adm2_out = self.proj_dir + "/" + paese + "/" + admin_name + "_" + adm_code + "/" + adm_code + "_pop.tif"
+                pop_taglio = arcpy.gp.ExtractByMask_sa(pop_raster, adm2_vector.name, pop_adm2_out)
+                # arcpy.gp.ExtractByMask_sa(pop_raster, adm2_vector.name, pop_adm2_out)
+                for raster in self.storms_tifs_sorted:
+                    # print raster
+                    nome_attivo = raster.split('_')[1]
+                    storm_adm2_out = self.proj_dir + "/" + paese + "/" + admin_name + "_" + adm_code + "/" + adm_code + "_" + nome_attivo + ".tif"
+                    print storm_adm2_out
                     try:
-                        print storm_adm2_out
-                        # print raster, paese, admin_name, adm_code, adm2_vector.name
-                        arcpy.gp.ExtractByMask_sa(arcpy.Raster(self.population_raster), adm2_vector.name, storm_adm2_out)
+                        # arcpy.gp.ExtractByMask_sa(arcpy.Raster(self.storms_tifs_dir + "/" + raster), adm2_vector.name, storm_adm2_out)
+                        raster_attivo = arcpy.Raster(self.storms_tifs_dir + "/" + raster)
+                        ciclone_taglio = arcpy.Clip_management(raster_attivo, "", storm_adm2_out, adm2_vector.name, "", "NONE", "NO_MAINTAIN_EXTENT")
+                        # arcpy.Clip_management(raster_attivo, "", storm_adm2_out, adm2_vector.name, "", "NONE", "NO_MAINTAIN_EXTENT")
                     except IOError as errore:
                         print "No Storm Raster"
+                    zs_pop_cat = self.proj_dir + "/" + paese + "/" + admin_name + "_" + adm_code + "/" + "zs_" + adm_code + ".dbf"
+                    # Process: Zonal Statistics as Table
+                    arcpy.gp.ZonalStatisticsAsTable_sa(ciclone_taglio, "Value", pop_taglio, zs_pop_cat, "DATA", "ALL")
             except:
-                print "No Population Raster"
+                print "Reached Maximum Category"
             self.statistics_storm_zones()
-
-            # self.lscan_cut_adm2 = self.proj_dir + paese + "/" + name_admin + "_" + str(code) + "/" + name_admin + "_pop.tif"
-            # try:
-            #     arcpy.gp.ExtractByMask_sa(self.population_raster, admin_vect, self.lscan_cut_adm2)
-            #     contatore = 1
-            #     for raster in self.drought_monthly_tifs:
-            #         rst_file = self.drought_monthly_tifs_dir + raster
-            #         try:
-            #             drought_out = self.proj_dir + paese + "/" + name_admin + "_" + str(code) + "/" + name_admin + "_drmo" + str(contatore) + ".tif"
-            #             self.adm2_drought_months.append(drought_out)
-            #             arcpy.gp.ExtractByMask_sa(arcpy.Raster(rst_file), admin_vect, drought_out )
-            #             contatore += 1
-            #         except:
-            #             return "No Drought Raster"
-
 
 
     def storm_adm2_polygons(self):
@@ -141,14 +139,14 @@ class ProjectStorms(object):
                                     layer_adminProj = layer_admin.GetSpatialRef()
                                     # layer_admin.SetAttributeFilter("ADM2_CODE=" + code_adm)
                                     # calcolo.rasterstats_statistics(file)
-                                    calcolo.cut_rasters_storms(self.paese, name_adm, code_adm,shapefile_adm2)
+                                    calcolo.cut_rasters_storms(self.paese, name_adm, code_adm, shapefile_adm2)
                         except:
                             pass
                 except IOError.message as problema_file:
                     print problema_file
         return lista
 
-paese_ricerca = "Philippines"
+paese_ricerca = "India"
 calcolo = ProjectStorms(paese_ricerca)
 calcolo.storm_adm2_polygons()
 
