@@ -105,12 +105,16 @@ class ProjectStorms(object):
                         # arcpy.gp.ExtractByMask_sa(arcpy.Raster(self.storms_tifs_dir + "/" + raster), adm2_vector.name, storm_adm2_out)
                         raster_attivo = arcpy.Raster(self.storms_tifs_dir + "/" + raster)
                         ciclone_taglio = arcpy.Clip_management(raster_attivo, "", storm_adm2_out, adm2_vector.name, "", "NONE", "NO_MAINTAIN_EXTENT")
-                        # arcpy.Clip_management(raster_attivo, "", storm_adm2_out, adm2_vector.name, "", "NONE", "NO_MAINTAIN_EXTENT")
                     except IOError as errore:
                         print "No Storm Raster"
-                    zs_pop_cat = self.proj_dir + "/" + paese + "/" + admin_name + "_" + adm_code + "/" + "zs_" + adm_code + ".dbf"
+                    zs_pop_cat = self.proj_dir + "/" + paese + "/" + admin_name + "_" + adm_code + "/" + "zs_" + adm_code + "_" + str(nome_attivo) + ".dbf"
                     # Process: Zonal Statistics as Table
-                    arcpy.gp.ZonalStatisticsAsTable_sa(ciclone_taglio, "Value", pop_taglio, zs_pop_cat, "DATA", "ALL")
+                    #TODO Possibile catch del raster vuoto
+                    try:
+                        arcpy.GetRasterProperties_management(ciclone_taglio)
+                        arcpy.gp.ZonalStatisticsAsTable_sa(ciclone_taglio, "Value", pop_taglio, zs_pop_cat, "DATA", "ALL")
+                    except:
+                        print "Area not Affected by this RP"
             except:
                 print "Reached Maximum Category"
             self.statistics_storm_zones()
@@ -146,7 +150,12 @@ class ProjectStorms(object):
                     print problema_file
         return lista
 
-paese_ricerca = "India"
+iso3 = 'IDN'
+paese = pycountry.countries.get(alpha3=iso3)
+iso = paese.alpha3
+nome_paese = paese.name
+
+paese_ricerca = nome_paese
 calcolo = ProjectStorms(paese_ricerca)
 calcolo.storm_adm2_polygons()
 

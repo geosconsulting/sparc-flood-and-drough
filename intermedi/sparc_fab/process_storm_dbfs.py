@@ -24,13 +24,13 @@ def prepare_storms_tables(paese):
                 if 'zs_' in fileName:
                     try:
                         if str(fileExtension) == '.dbf':
-                            temporal_string = fileName.split("\\")[-1].split("_")[1]
+                            temporal_string = fileName.split("_")[3]
                             temporal_value = ''.join(x for x in temporal_string if x.isdigit())
                             in_dbf = dbf.Dbf(fileName + fileExtension)
                             for rec in in_dbf:
                                 cat_ciclone = rec['VALUE']
                                 num_people = rec['SUM']
-                                indice_df = code_adm + "_" + str(rec['VALUE'])
+                                indice_df = code_adm + "_" + str(rec['VALUE']) + "_" + temporal_string
                                 # persone_rischio_cat_SaffirSimpson[indice_df] = {}
                                 # persone_rischio_cat_SaffirSimpson[indice_df]['country'] = paese
                                 # persone_rischio_cat_SaffirSimpson[indice_df]['iso_paese'] = iso_paese
@@ -48,7 +48,7 @@ def prepare_storms_tables(paese):
                         pass
     return persone_rischio_cat_SaffirSimpson
 
-paese_ricerca = "Bangladesh"
+paese_ricerca = "Cambodia"
 dict_persone_at_risk = prepare_storms_tables(paese_ricerca)
 
 df_people_at_risk = pd.DataFrame.from_dict(dict_persone_at_risk).transpose()

@@ -297,4 +297,4 @@ def iterare_sul_paese(iso3):
     # os.chdir(CYLONES_RECLASSED_DIR)
     # category_reclass_yearly_tifs = glob.glob("*.tif")
 
-iterare_sul_paese('PHL')
+iterare_sul_paese('IND')
