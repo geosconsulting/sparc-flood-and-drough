@@ -322,7 +322,6 @@ class DataAnalysisHistoricalEMDAT(object):
         plt.show()
 
 # paese = pycountry.countries.get(name = 'Korea Dem P Rep')
-
 paese= pycountry.countries.get(alpha3 = 'HTI')
 iso = paese.alpha3
 nome_paese = paese.name
@@ -350,9 +349,7 @@ visual_interpretation.plottaggi()
 locazioni_da_inviare_alla_geocodifica = {}
 indice_esterno = 1
 for indice, locazione in locazioni_singole.iteritems():
-    if locazione is not None and len(locazione)>0:
-        # print indice
-        # print locazione
+    if locazione is not None and len(locazione)> 0:
         chiave = str(indice) + "-" + str(indice_esterno)
         if ';' not in locazione:
             locazioni_da_inviare_alla_geocodifica[chiave] = str(locazione).strip()

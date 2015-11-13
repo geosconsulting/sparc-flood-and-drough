@@ -150,7 +150,7 @@ class ProjectStorms(object):
                     print problema_file
         return lista
 
-iso3 = 'MMR'
+iso3 = 'YEM'
 paese = pycountry.countries.get(alpha3=iso3)
 iso = paese.alpha3
 nome_paese = paese.name

@@ -4,7 +4,7 @@ import os
 import glob
 import pycountry
 import pandas as pd
-from sqlalchemy import create_engine, MetaData
+from sqlalchemy import create_engine
 
 
 def prepare_storms_tables(paese):
@@ -31,13 +31,6 @@ def prepare_storms_tables(paese):
                                 cat_ciclone = rec['VALUE']
                                 num_people = rec['SUM']
                                 indice_df = code_adm + "_" + str(rec['VALUE']) + "_" + temporal_string
-                                # persone_rischio_cat_SaffirSimpson[indice_df] = {}
-                                # persone_rischio_cat_SaffirSimpson[indice_df]['country'] = paese
-                                # persone_rischio_cat_SaffirSimpson[indice_df]['iso_paese'] = iso_paese
-                                # persone_rischio_cat_SaffirSimpson[indice_df]['code_adm'] = code_adm
-                                # persone_rischio_cat_SaffirSimpson[indice_df]['iso_paese'] = iso_paese
-                                # persone_rischio_cat_SaffirSimpson[indice_df]['cat_cycl'] = cat_ciclone
-                                # persone_rischio_cat_SaffirSimpson[indice_df]['num_people'] = num_people
                                 persone_rischio_cat_SaffirSimpson[indice_df] = {}
                                 persone_rischio_cat_SaffirSimpson[indice_df]['iso_paese'] = iso_paese
                                 persone_rischio_cat_SaffirSimpson[indice_df]['code_adm'] = code_adm
