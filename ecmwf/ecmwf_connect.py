@@ -1,15 +1,17 @@
 from ecmwfapi import ECMWFDataServer
 server = ECMWFDataServer()
 
-import fiona
+import genera_date
 
-from osgeo import gdal, gdalnumeric, ogr, osr
-import PIL
+import json
+import fiona
+import numpy as np
+import pandas as pd
+from osgeo import gdal, gdalnumeric
 import os, sys
 gdal.UseExceptions()
 
 def caratteristiche_shp(file_shp):
-
 
     ilVettore = fiona.open(file_shp)
     laProiezioneDelVettore = ilVettore.crs
@@ -25,7 +27,8 @@ def fetch_ECMWF_data(file_output, time_frame, area_richiesta):
     south = area_richiesta[1]
     east = area_richiesta[2]
     illo = str(north) + "/" + str(west) + "/" + str(south) + "/" + str(east)
-    print illo
+
+    file_output = file_output
 
     # request FABIO
     # server.retrieve({
@@ -44,25 +47,59 @@ def fetch_ECMWF_data(file_output, time_frame, area_richiesta):
     #     "type": "cf",
     #  })
 
-    # request WFP
+    # # request WFP
+    # server.retrieve({
+    #     "class": "ei",
+    #     "dataset": "interim",
+    #     "date": time_frame,
+    #     "expver": "1",
+    #     # "grid": "0.75/0.75",
+    #     "grid": "0.125/0.125",
+    #     "levtype": "sfc",
+    #     "param": "228.128",
+    #     "step": "12",
+    #     "stream": "oper",
+    #     # "area": "E",
+    #      "area" : illo,
+    #     "target": file_output,
+    #     # "format": "netcdf",
+    #     "time": "12",
+    #     "type": "fc",
+    # })
+
+    # request WFP UN MESE ERA-Interim, Daily
     server.retrieve({
         "class": "ei",
         "dataset": "interim",
         "date": time_frame,
-        "expver": "1",
-        # "grid": "0.75/0.75",
+        "expver": "1931",
         "grid": "0.125/0.125",
         "levtype": "sfc",
         "param": "228.128",
         "step": "12",
-        "stream": "oper",
-        # "area": "E",
-         "area" : illo,
+        "stream": "mdfa",
+        "area": illo,
         "target": file_output,
-        # "format": "netcdf",
         "time": "12",
         "type": "fc",
     })
+
+    # # request WFP Hindcast 2015 November
+    # server.retrieve({
+    #     "class": "od",
+    #     "dataset": "interim",
+    #     "date": "=2015-05-11",
+    #     "expver": "67",
+    #     "grid": "0.125/0.125",
+    #     "levtype": "sfc",
+    #     "param": "228.128",
+    #     "step" : "0-24/0-72/0-120/0-240/0-360/12-36/12-84/12-132/24-48/24-96/24-144/36-60/36-108/36-156/48-72/48-120/48-168/60-84/60-132/60-180/72-96/72-144/72-192/84-108/84-156/84-204/96-120/96-168/96-216/108-132/108-180/108-228/120-144/120-192/132-156/132-204/144-168/144-216/156-180/156-228/240-360",
+    #     "stream" : "efhs",
+    #     "target": "gribs/test.grib",
+    #     "time": "00",
+    #     "type": "cd",
+    # })
+
 
 def apriRaster(raster):
     try:
@@ -74,65 +111,109 @@ def apriRaster(raster):
 
     return src_ds
 
-def rasterStats(raster):
+def genera_statistiche_banda_grib(banda, indice):
 
-    print "[ RASTER BAND COUNT ]: ", raster.RasterCount
-    lista_bande = []
+    print
+    print "DATA FOR BAND", indice
+    stats = banda.GetStatistics(True, True)
+    if stats is None:
+        pass
 
-    for band in range(raster.RasterCount):
-        band += 1
-        print "[GETTING BAND]: ", band
-        srcband = raster.GetRasterBand(band)
-        lista_bande.append(srcband)
-        if srcband is None:
-            continue
+    print "Minimum=%.3f, Maximum=%.3f, Mean=%.3f, StdDev=%.3f" % (stats[0], stats[1], stats[2], stats[3])
+    print "NO DATA VALUE = ", banda.GetNoDataValue()
+    print "MIN = ", banda.GetMinimum()
+    print "MAX = ", banda.GetMaximum()
+    print "SCALE = ", banda.GetScale()
+    print "UNIT TYPE = ", banda.GetUnitType()
 
-        stats = srcband.GetStatistics(True, True)
-        if stats is None:
-            pass
+def plotRasterHistogram(file_mean):
 
-        print "Minimum=%.3f, Maximum=%.3f, Mean=%.3f, StdDev=%.3f" % (stats[0], stats[1], stats[2], stats[3])
-        print "NO DATA VALUE = ", srcband.GetNoDataValue()
-        print "MIN = ", srcband.GetMinimum()
-        print "MAX = ", srcband.GetMaximum()
-        print "SCALE = ", srcband.GetScale()
-        print "UNIT TYPE = ", srcband.GetUnitType()
-
-def taglia_raster(banda):
-
-    #
-    #  create output datasource
-    #
-    dst_layername = "POLYGONIZED_STUFF"
-    drv = ogr.GetDriverByName("ESRI Shapefile")
-    dst_ds = drv.CreateDataSource(dst_layername + ".shp" )
-    dst_layer = dst_ds.CreateLayer(dst_layername, srs = None )
-
-    gdal.Polygonize(banda, None, dst_layer, -1, [], callback=None )
+    #Open the dataset
+    ds1 = gdal.Open(file_mean)
+    banda = ds1.GetRasterBand(1)
+    dati = gdalnumeric.BandReadAsArray(banda)
+    print dati
 
 def Usage():
 
-    print("example run : $ python getting_grib_files.py /<full-path>/<shapefile-name>.shp /<full-path>/<raster-name>.tif 2015-07-31 2015-08-30")
+    print("example run : $ python ecmwf_connect.py country name")
     sys.exit(1)
+
+
+def genera_gribs(ritornato,vector_file,raster_file):
+
+    date = open(ritornato)
+    time_frame = json.load(date)
+    proiezione, area_richiesta = caratteristiche_shp(vector_file)
+    fetch_ECMWF_data(raster_file, time_frame, area_richiesta)
+
+
+def genera_means(file_path):
+
+        print "ECMWF file exists calculating statistics"
+        print "Change the name of the output grib file for fetching new data"
+        nome_tif_mean = "calc/historical/mean_" + tre_lettere + parte_date + ".tif"
+
+        ecmfwf_file_asRaster = gdal.Open(file_path)
+        x_size =  ecmfwf_file_asRaster.RasterXSize
+        y_size = ecmfwf_file_asRaster.RasterYSize
+        numero_bande = ecmfwf_file_asRaster.RasterCount
+        banda_esempio = ecmfwf_file_asRaster.GetRasterBand(1)
+        type_banda_esempio = banda_esempio.DataType
+
+        banda_somma = np.zeros((y_size, x_size,), dtype= np.float64)
+        print "Dimensione raster somma %d " % banda_somma.ndim
+        for i in range(1, numero_bande):
+            banda = ecmfwf_file_asRaster.GetRasterBand(i)
+            genera_statistiche_banda_grib(banda, i)
+            data = gdalnumeric.BandReadAsArray(banda)
+            banda_somma = banda_somma + data
+        # mean_bande_in_mm = (banda_somma/numero_bande)*1000
+        # CONFRONTANDO FORECAST CON FORECAST NON HO BISOGNO DI AVERLO IN MILLIMETRI LACIO TUTTO IN METRI
+        mean_bande_in_mm = (banda_somma/numero_bande)
+
+        # Write the out file
+        driver = gdal.GetDriverByName("GTiff")
+        raster_mean_from_bands = driver.Create(nome_tif_mean, x_size, y_size, 1, type_banda_esempio)
+        gdalnumeric.CopyDatasetInfo(ecmfwf_file_asRaster, raster_mean_from_bands)
+        banda_dove_scrivere_raster_mean = raster_mean_from_bands.GetRasterBand(1)
+        gdalnumeric.BandWriteArray(banda_dove_scrivere_raster_mean, mean_bande_in_mm)
+
+def analisi_raster_con_GDALNUMERICS(nome_tif_mean):
+
+        pass
+
+        plotRasterHistogram(nome_tif_mean)
+        # PRIMO TENTATIVO CON GDALNUMERIC CREA SOLO MAGGIORE CONFUSIONE PREFERISCO ANDARE CON GDAL
+
+        arr = gdalnumeric.LoadFile(raster_file)
+        righe, colonne = arr.shape[1], arr.shape[2]
+        print "mean", arr.mean()
+
+        numero_bande = len(arr)
+        banda_somma = np.zeros((righe, colonne))
+        for i in range(0, numero_bande):
+             banda_somma = banda_somma + arr[i]
+        mean_bande = banda_somma/numero_bande
+
+        # PRIMO TENTATIVO CON GDALNUMERIC CREA SOLO MAGGIORE CONFUSIONE PREFERISCO ANDARE CON GDAL
 
 if __name__ == '__main__':
 
-    if len(sys.argv) < 4:
+    if len(sys.argv) < 1:
         Usage()
         sys.exit(1)
 
-    raster_file = sys.argv[1]
-    vector_file = sys.argv[2]
-    data_minima = str(sys.argv[3])
-    data_massima = str(sys.argv[4])
+    vector_file = "c:/sparc/input_data/countries/" + sys.argv[1] + ".shp"
+    paese = vector_file.split(".")[0].split("/")[-1]
+    ritornato = genera_date.crea_file(paese)
+    parte_date = ritornato.split("/")[1].split(".")[0][4:]
+    tre_lettere = vector_file.split(".")[0].split("/")[-1][0:3]
+    raster_file = "gribs/historical/" + tre_lettere + parte_date + ".grib"
 
-    if os.path.isfile(sys.argv[1]):
-        print "ECMWF file exists change the name of the output grib file"
-        pass
+    if os.path.isfile(raster_file):
+        genera_means(raster_file)
     else:
-        # "2015-07-31/to/2015-08-30"
-        time_frame = data_minima + "/to/" + data_massima
-        proiezione, area_richiesta = caratteristiche_shp(vector_file)
-        fetch_ECMWF_data(raster_file, time_frame, area_richiesta)
-        # raster = apriRaster(raster_file)
-        # rasterStats(raster)
+        genera_gribs(ritornato, vector_file, raster_file)
+        genera_means(raster_file)
+

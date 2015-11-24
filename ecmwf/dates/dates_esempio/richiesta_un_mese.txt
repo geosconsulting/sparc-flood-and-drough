@@ -1,0 +1,12 @@
+retrieve,
+class=ei,
+date=20151001,
+expver=1931,
+levtype=sfc,
+param=228.128,
+step=0-12,
+stream=mdfa,
+type=fc
+
+
+python ecmwf_connect.py honduras_oct2015.grib c:/sparc/input_data/countries/honduras.shp 2014-01-01 2014-12-31
