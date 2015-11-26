@@ -1,10 +1,27 @@
 import os
 import datetime
+import pandas as pd
 
 def raccolta_parametri(iso):
 
-    anno_minimo = input("Starting Year: ")
-    anno_massimo = input("Ending Year (max 2014): ")
+    range_anni = range(1979, 2015)
+    while True:
+        anno_minimo = input("Starting Year: ")
+        if anno_minimo in range_anni:
+            print "Selected %d " % anno_minimo
+            break
+        else:
+            print "Year must be between 1979 and 2014"
+
+    while True:
+        anno_massimo = input("Ending Year (max 2014): ")
+        if anno_massimo in range_anni:
+            print "Selected %d " % anno_massimo
+            break
+        else:
+            print "Year must be between 1979 and 2014"
+
+    range_anni_scelti = range(anno_minimo,anno_massimo+1)
     # numero_anni = input("Number of Years : ")
     numero_anni = anno_massimo - anno_minimo
     print("Fetching data for %d years" % numero_anni)
@@ -15,23 +32,23 @@ def raccolta_parametri(iso):
     # giorno_fine = giorno_inizio + 7
     giorno_fine = giorno_inizio + 8
 
-    return anno_minimo, anno_massimo, numero_anni, mese,giorno_inizio, giorno_fine
+    return anno_minimo, anno_massimo, numero_anni, mese, giorno_inizio, giorno_fine, range_anni_scelti
 
 def controlla_date(anno_inizio, mese_inizio, giorno_inizio):
 
     lista_mese_giorno = []
+    lista_giorni = []
     data_iniziale = datetime.date(int(anno_inizio), int(mese_inizio), int(giorno_inizio))
 
     salto_giorni = datetime.timedelta(days=8)
     data_finale = data_iniziale + salto_giorni
 
-    lista_giorni = [data_iniziale - salto_giorni for x in range(0, 8)]
-    print lista_giorni
+     # MENO LEGGIBILE
+    # lista_giorni_comprehension = [data_iniziale + salto_giorni for x in range(0, 8)]
+    # print lista_giorni
 
-    import pandas as pd
-    # datelist = pd.date_range(pd.datetime.today(), periods=100).tolist()
-    datelist = pd.date_range(pd.datetime(int(anno_inizio), int(mese_inizio), int(giorno_inizio)), periods=8).tolist()
-    print datelist
+    # PANDAS NON RIDUCE LA COMPLESSITA
+    # datelist = pd.date_range(pd.datetime(int(anno_inizio), int(mese_inizio), int(giorno_inizio)), periods=8).tolist()
 
     giorno_data_inziale = data_iniziale.day
     giorno_data_finale = data_finale.day
@@ -39,14 +56,14 @@ def controlla_date(anno_inizio, mese_inizio, giorno_inizio):
     mese_data_finale = data_finale.month
 
     lista_mese_giorno.append(str(mese_data_inziale) + "-" + str(giorno_data_inziale))
-    lista_giorni.append(giorno_inizio)
+    lista_giorni.append(giorno_data_inziale)
     for indice in range(1, 8):
         range_date = datetime.timedelta(days=indice)
-        giorni_successivi  = data_iniziale + range_date
+        giorni_successivi = data_iniziale + range_date
         lista_mese_giorno.append(str(giorni_successivi.month) + "-" + str(giorni_successivi.day))
         lista_giorni.append(giorni_successivi)
 
-    return lista_mese_giorno, giorno_data_inziale, mese_data_inziale , giorno_data_finale, mese_data_finale
+    return lista_mese_giorno, giorno_data_inziale, mese_data_inziale, giorno_data_finale, mese_data_finale
 
 def crea_file(anno_minimo, numero_anni, mese, giorno_inizio, giorno_fine):
 
@@ -85,47 +102,69 @@ def crea_file(anno_minimo, numero_anni, mese, giorno_inizio, giorno_fine):
 
     return file_path
 
-def crea_file_avanzato(anno_minimo, numero_anni, lista_giorni):
+def crea_file_avanzato(lista_anni, lista_giorni):
 
-    lista_anni = []
+    print lista_giorni
     lista_finale = []
-    giorno_controllo = giorno_inizio
-    for anno_inizio in range(0, numero_anni):
-        lista_anni.append(anno_minimo + anno_inizio)
+    for anno in lista_anni:
+        for giorno in lista_giorni:
+            lista_finale.append(str(anno) + "-" + giorno)
 
-    # for anno in lista_anni:
-    #     while giorno_controllo < giorno_fine:
-    #         lista_finale.append(str(anno) + "-" + str(mese) + "-" + str(giorno_controllo))
-    #         giorno_controllo += 1
-    #     giorno_controllo = giorno_inizio
-    #
-    # prima_parte = str(giorno_inizio) + str(giorno_fine-1)
-    # seconda_parte = str(anno_minimo) + str(max(lista_anni))
-    # file_path = 'dates/' + "req_" + str(prima_parte) + "_" + str(mese) + "_" + str(seconda_parte) + ".txt"
-    # if os.path.isfile(file_path):
-    #     print "FILE DATES ESISTENTE"
-    #     return file_path
-    #
-    # nuovo = open(file_path, mode='w')
-    # nuovo.write('"')
-    # lunghezza_lista = len(lista_finale)
-    # contatore = 1
-    #
-    # for illo in sorted(lista_finale):
-    #     contatore += 1
-    #     if contatore <= lunghezza_lista:
-    #         nuovo.write(illo + "/")
-    #     else:
-    #         nuovo.write(illo)
-    # nuovo.write('"')
-    # nuovo.close()
-    #
-    # return file_path
+    imesi = [i.split('-', 1)[0] for i in lista_giorni]
+    mese_minimo = min(imesi)
+    mese_massimo = max(imesi)
+    # print mese_minimo, mese_massimo
+    if mese_minimo == mese_massimo:
+        igiorni = [i.split('-', 1)[1] for i in lista_giorni]
+        giorno_minimo = min(igiorni)
+        giorno_massimo = max(igiorni)
+        print giorno_minimo, giorno_massimo
+    else:
+        igiorni_a = [i.split(str(mese_massimo), 1)[0] for i in lista_giorni]
+        solo_valori_igiorni_prima = filter(None, [i.split('-', 0)[0] for i in igiorni_a])
+        igiorni_prima = [i.split('-', 1)[1] for i in solo_valori_igiorni_prima]
+        igiorni_b = [i.split(str(mese_minimo), 1)[0] for i in lista_giorni]
+        solo_valori_igiorni_dopo = filter(None, [i.split('-', 0)[0] for i in igiorni_b])
+        igiorni_dopo = [i.split('-', 1)[1] for i in solo_valori_igiorni_dopo]
+        giorno_minimo_a = min(igiorni_prima)
+        # giorno_massimo_a = max(igiorni_prima)
+        # giorno_minimo_b = min(igiorni_dopo)
+        giorno_massimo_b = max(igiorni_dopo)
+
+        giorno_minimo = giorno_minimo_a
+        giorno_massimo = giorno_massimo_b
+        mese = str(mese_minimo) + "_" + str(mese_massimo)
+        print giorno_minimo, giorno_massimo
+
+    anno_minimo = min(lista_anni)
+    anno_massimo = max(lista_anni)
+
+    prima_parte = str(giorno_minimo) + str(giorno_massimo)
+    seconda_parte = str(anno_minimo) + str(anno_massimo)
+    file_path = 'dates/' + "req_" + str(prima_parte) + "_" + str(mese) + "_" + str(seconda_parte) + ".txt"
+    if os.path.isfile(file_path):
+        print "FILE DATES ESISTENTE"
+        return file_path
+
+    nuovo = open(file_path, mode='w')
+    nuovo.write('"')
+    lunghezza_lista = len(lista_finale)
+    contatore = 1
+
+    for illo in sorted(lista_finale):
+        contatore += 1
+        if contatore <= lunghezza_lista:
+            nuovo.write(illo + "/")
+        else:
+            nuovo.write(illo)
+    nuovo.write('"')
+    nuovo.close()
+
+    return file_path
 
 dati_raccolti = raccolta_parametri("pippo")
-print dati_raccolti
+lista_anni_analisi = dati_raccolti[6]
 liste_date = controlla_date(dati_raccolti[0], dati_raccolti[3], dati_raccolti[4])
-print liste_date[0]
-print liste_date[1:]
-# crea_file(dati_raccolti[0],dati_raccolti[2],int(dati_raccolti[3]),dati_raccolti[4],dati_raccolti[5])
-
+lista_mese_giorno =liste_date[0]
+# print liste_date[1:]
+crea_file_avanzato(lista_anni_analisi,lista_mese_giorno)
