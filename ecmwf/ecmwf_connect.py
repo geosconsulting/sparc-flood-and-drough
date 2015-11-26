@@ -100,7 +100,6 @@ def fetch_ECMWF_data(file_output, time_frame, area_richiesta):
     #     "type": "cd",
     # })
 
-
 def apriRaster(raster):
     try:
         src_ds = gdal.Open(raster)
@@ -139,14 +138,12 @@ def Usage():
     print("example run : $ python ecmwf_connect.py country name")
     sys.exit(1)
 
-
-def genera_gribs(ritornato,vector_file,raster_file):
+def genera_gribs(ritornato, vector_file, raster_file):
 
     date = open(ritornato)
     time_frame = json.load(date)
     proiezione, area_richiesta = caratteristiche_shp(vector_file)
     fetch_ECMWF_data(raster_file, time_frame, area_richiesta)
-
 
 def genera_means(file_path):
 
@@ -158,18 +155,19 @@ def genera_means(file_path):
         x_size =  ecmfwf_file_asRaster.RasterXSize
         y_size = ecmfwf_file_asRaster.RasterYSize
         numero_bande = ecmfwf_file_asRaster.RasterCount
+        # print "Ci sono %d bande " % numero_bande
         banda_esempio = ecmfwf_file_asRaster.GetRasterBand(1)
         type_banda_esempio = banda_esempio.DataType
 
-        banda_somma = np.zeros((y_size, x_size,), dtype= np.float64)
-        print "Dimensione raster somma %d " % banda_somma.ndim
+        banda_somma = np.zeros((y_size, x_size,), dtype=np.float64)
         for i in range(1, numero_bande):
             banda = ecmfwf_file_asRaster.GetRasterBand(i)
-            genera_statistiche_banda_grib(banda, i)
+            # NON MI SERVE IN QUESTA FASE MA E' UTILE IN PROSPETTIVA
+            # genera_statistiche_banda_grib(banda, i)
             data = gdalnumeric.BandReadAsArray(banda)
             banda_somma = banda_somma + data
         # mean_bande_in_mm = (banda_somma/numero_bande)*1000
-        # CONFRONTANDO FORECAST CON FORECAST NON HO BISOGNO DI AVERLO IN MILLIMETRI LACIO TUTTO IN METRI
+        # CONFRONTANDO FORECAST CON FORECAST NON HO BISOGNO DI AVERLO IN MILLIMETRI LASCIO TUTTO IN METRI
         mean_bande_in_mm = (banda_somma/numero_bande)
 
         # Write the out file
@@ -177,15 +175,17 @@ def genera_means(file_path):
         raster_mean_from_bands = driver.Create(nome_tif_mean, x_size, y_size, 1, type_banda_esempio)
         gdalnumeric.CopyDatasetInfo(ecmfwf_file_asRaster, raster_mean_from_bands)
         banda_dove_scrivere_raster_mean = raster_mean_from_bands.GetRasterBand(1)
-        gdalnumeric.BandWriteArray(banda_dove_scrivere_raster_mean, mean_bande_in_mm)
+        try:
+            gdalnumeric.BandWriteArray(banda_dove_scrivere_raster_mean, mean_bande_in_mm)
+            print "mean raster exported"
+        except IOError as err:
+            print err.message
 
 def analisi_raster_con_GDALNUMERICS(nome_tif_mean):
 
-        pass
-
         plotRasterHistogram(nome_tif_mean)
-        # PRIMO TENTATIVO CON GDALNUMERIC CREA SOLO MAGGIORE CONFUSIONE PREFERISCO ANDARE CON GDAL
 
+        # PRIMO TENTATIVO CON GDALNUMERIC CREA SOLO MAGGIORE CONFUSIONE PREFERISCO ANDARE CON GDAL
         arr = gdalnumeric.LoadFile(raster_file)
         righe, colonne = arr.shape[1], arr.shape[2]
         print "mean", arr.mean()
@@ -195,7 +195,6 @@ def analisi_raster_con_GDALNUMERICS(nome_tif_mean):
         for i in range(0, numero_bande):
              banda_somma = banda_somma + arr[i]
         mean_bande = banda_somma/numero_bande
-
         # PRIMO TENTATIVO CON GDALNUMERIC CREA SOLO MAGGIORE CONFUSIONE PREFERISCO ANDARE CON GDAL
 
 if __name__ == '__main__':
@@ -212,8 +211,10 @@ if __name__ == '__main__':
     raster_file = "gribs/historical/" + tre_lettere + parte_date + ".grib"
 
     if os.path.isfile(raster_file):
+        print "grib esiste"
         genera_means(raster_file)
     else:
+        print "grib non esiste"
         genera_gribs(ritornato, vector_file, raster_file)
         genera_means(raster_file)
 
