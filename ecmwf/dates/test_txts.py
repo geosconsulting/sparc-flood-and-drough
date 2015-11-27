@@ -1,4 +1,4 @@
-letto = open('test_corto.txt')
-letto1 = open('req_1522_20002003.txt')
-for riga in letto:
+letto = open('req_274_11_12_19852012.txt')
+letto1 = open('req_2330_11_19792014.txt')
+for riga in letto1:
     print riga

@@ -21,14 +21,11 @@ def caratteristiche_shp(file_shp):
 
 def fetch_ECMWF_data(file_output, time_frame, area_richiesta):
 
-    print time_frame
     north = area_richiesta[3]
     west = area_richiesta[0]
     south = area_richiesta[1]
     east = area_richiesta[2]
     illo = str(north) + "/" + str(west) + "/" + str(south) + "/" + str(east)
-
-    file_output = file_output
 
     # request FABIO
     # server.retrieve({
@@ -142,6 +139,7 @@ def genera_gribs(ritornato, vector_file, raster_file):
 
     date = open(ritornato)
     time_frame = json.load(date)
+    print time_frame
     proiezione, area_richiesta = caratteristiche_shp(vector_file)
     fetch_ECMWF_data(raster_file, time_frame, area_richiesta)
 
@@ -205,7 +203,7 @@ if __name__ == '__main__':
 
     vector_file = "c:/sparc/input_data/countries/" + sys.argv[1] + ".shp"
     paese = vector_file.split(".")[0].split("/")[-1]
-    ritornato = genera_date.crea_file(paese)
+    ritornato = genera_date.scateniamo_l_inferno(paese)
     parte_date = ritornato.split("/")[1].split(".")[0][4:]
     tre_lettere = vector_file.split(".")[0].split("/")[-1][0:3]
     raster_file = "gribs/historical/" + tre_lettere + parte_date + ".grib"

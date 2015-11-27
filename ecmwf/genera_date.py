@@ -50,20 +50,20 @@ def controlla_date(anno_inizio, mese_inizio, giorno_inizio):
     # PANDAS NON RIDUCE LA COMPLESSITA
     # datelist = pd.date_range(pd.datetime(int(anno_inizio), int(mese_inizio), int(giorno_inizio)), periods=8).tolist()
 
-    giorno_data_inziale = data_iniziale.day
-    giorno_data_finale = data_finale.day
-    mese_data_inziale = data_iniziale.month
-    mese_data_finale = data_finale.month
+    giorno_data_iniziale = '{:02d}'.format(data_iniziale.day)
+    giorno_data_finale = '{:02d}'.format(data_finale.day)
+    mese_data_inziale = '{:02d}'.format(data_iniziale.month)
+    mese_data_finale = '{:02d}'.format(data_finale.month)
 
-    lista_mese_giorno.append(str(mese_data_inziale) + "-" + str(giorno_data_inziale))
-    lista_giorni.append(giorno_data_inziale)
+    lista_mese_giorno.append(str(mese_data_inziale) + "-" + str(giorno_data_iniziale))
+    lista_giorni.append(giorno_data_iniziale)
     for indice in range(1, 8):
         range_date = datetime.timedelta(days=indice)
         giorni_successivi = data_iniziale + range_date
-        lista_mese_giorno.append(str(giorni_successivi.month) + "-" + str(giorni_successivi.day))
+        lista_mese_giorno.append('{:02d}'.format(giorni_successivi.month) + "-" + '{:02d}'.format(giorni_successivi.day))
         lista_giorni.append(giorni_successivi)
 
-    return lista_mese_giorno, giorno_data_inziale, mese_data_inziale, giorno_data_finale, mese_data_finale
+    return lista_mese_giorno, giorno_data_iniziale, mese_data_inziale, giorno_data_finale, mese_data_finale
 
 def crea_file(anno_minimo, numero_anni, mese, giorno_inizio, giorno_fine):
 
@@ -104,11 +104,10 @@ def crea_file(anno_minimo, numero_anni, mese, giorno_inizio, giorno_fine):
 
 def crea_file_avanzato(lista_anni, lista_giorni):
 
-    print lista_giorni
     lista_finale = []
     for anno in lista_anni:
         for giorno in lista_giorni:
-            lista_finale.append(str(anno) + "-" + giorno)
+                lista_finale.append(str(anno) + "-" + giorno)
 
     imesi = [i.split('-', 1)[0] for i in lista_giorni]
     mese_minimo = min(imesi)
@@ -118,7 +117,7 @@ def crea_file_avanzato(lista_anni, lista_giorni):
         igiorni = [i.split('-', 1)[1] for i in lista_giorni]
         giorno_minimo = min(igiorni)
         giorno_massimo = max(igiorni)
-        print giorno_minimo, giorno_massimo
+        mese = mese_minimo
     else:
         igiorni_a = [i.split(str(mese_massimo), 1)[0] for i in lista_giorni]
         solo_valori_igiorni_prima = filter(None, [i.split('-', 0)[0] for i in igiorni_a])
@@ -134,7 +133,7 @@ def crea_file_avanzato(lista_anni, lista_giorni):
         giorno_minimo = giorno_minimo_a
         giorno_massimo = giorno_massimo_b
         mese = str(mese_minimo) + "_" + str(mese_massimo)
-        print giorno_minimo, giorno_massimo
+        # print giorno_minimo, giorno_massimo
 
     anno_minimo = min(lista_anni)
     anno_massimo = max(lista_anni)
@@ -162,9 +161,11 @@ def crea_file_avanzato(lista_anni, lista_giorni):
 
     return file_path
 
-dati_raccolti = raccolta_parametri("pippo")
-lista_anni_analisi = dati_raccolti[6]
-liste_date = controlla_date(dati_raccolti[0], dati_raccolti[3], dati_raccolti[4])
-lista_mese_giorno =liste_date[0]
-# print liste_date[1:]
-crea_file_avanzato(lista_anni_analisi,lista_mese_giorno)
+def scateniamo_l_inferno(paese):
+
+    dati_raccolti = raccolta_parametri(paese)
+    lista_anni_analisi = dati_raccolti[6]
+    liste_date = controlla_date(dati_raccolti[0], dati_raccolti[3], dati_raccolti[4])
+    lista_mese_giorno = liste_date[0]
+    il_file_generato = crea_file_avanzato(lista_anni_analisi, lista_mese_giorno)
+    return il_file_generato
