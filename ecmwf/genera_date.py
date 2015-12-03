@@ -1,6 +1,5 @@
 import os
 import datetime
-import pandas as pd
 
 def raccolta_parametri(iso):
 
@@ -29,18 +28,20 @@ def raccolta_parametri(iso):
     if len(mese) == 1:
         mese = "0" + mese
     giorno_inizio = input("Starting Day: ")
+    numero_giorni = input("Number of days: ")
     # giorno_fine = giorno_inizio + 7
-    giorno_fine = giorno_inizio + 8
+    # giorno_fine = giorno_inizio + 8
+    giorno_fine = giorno_inizio + numero_giorni
 
-    return anno_minimo, anno_massimo, numero_anni, mese, giorno_inizio, giorno_fine, range_anni_scelti
+    return anno_minimo, anno_massimo, numero_anni, mese, giorno_inizio, giorno_fine, range_anni_scelti, numero_giorni
 
-def controlla_date(anno_inizio, mese_inizio, giorno_inizio):
+def controlla_date(anno_inizio, mese_inizio, giorno_inizio, salto):
 
     lista_mese_giorno = []
     lista_giorni = []
     data_iniziale = datetime.date(int(anno_inizio), int(mese_inizio), int(giorno_inizio))
 
-    salto_giorni = datetime.timedelta(days=8)
+    salto_giorni = datetime.timedelta(days = salto)
     data_finale = data_iniziale + salto_giorni
 
      # MENO LEGGIBILE
@@ -57,7 +58,7 @@ def controlla_date(anno_inizio, mese_inizio, giorno_inizio):
 
     lista_mese_giorno.append(str(mese_data_inziale) + "-" + str(giorno_data_iniziale))
     lista_giorni.append(giorno_data_iniziale)
-    for indice in range(1, 8):
+    for indice in range(1, salto):
         range_date = datetime.timedelta(days=indice)
         giorni_successivi = data_iniziale + range_date
         lista_mese_giorno.append('{:02d}'.format(giorni_successivi.month) + "-" + '{:02d}'.format(giorni_successivi.day))
@@ -165,7 +166,7 @@ def scateniamo_l_inferno(paese):
 
     dati_raccolti = raccolta_parametri(paese)
     lista_anni_analisi = dati_raccolti[6]
-    liste_date = controlla_date(dati_raccolti[0], dati_raccolti[3], dati_raccolti[4])
+    liste_date = controlla_date(dati_raccolti[0], dati_raccolti[3], dati_raccolti[4], dati_raccolti[7])
     lista_mese_giorno = liste_date[0]
     il_file_generato = crea_file_avanzato(lista_anni_analisi, lista_mese_giorno)
     return il_file_generato

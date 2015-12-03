@@ -6,9 +6,9 @@ import genera_date
 import json
 import fiona
 import numpy as np
-import pandas as pd
 from osgeo import gdal, gdalnumeric
-import os, sys
+import os
+import sys
 gdal.UseExceptions()
 
 def caratteristiche_shp(file_shp):
@@ -121,14 +121,6 @@ def genera_statistiche_banda_grib(banda, indice):
     print "MAX = ", banda.GetMaximum()
     print "SCALE = ", banda.GetScale()
     print "UNIT TYPE = ", banda.GetUnitType()
-
-def plotRasterHistogram(file_mean):
-
-    #Open the dataset
-    ds1 = gdal.Open(file_mean)
-    banda = ds1.GetRasterBand(1)
-    dati = gdalnumeric.BandReadAsArray(banda)
-    print dati
 
 def Usage():
 
