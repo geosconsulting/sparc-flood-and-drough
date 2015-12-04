@@ -7,7 +7,7 @@ import CompleteProcessingDrought as completeDrought
 from Tkinter import *
 import tkMessageBox
 import ttk
-import time
+
 
 class AppSPARC:
 
@@ -29,10 +29,10 @@ class AppSPARC:
 
         self.collect_codes_country_level()
         self.box_value_adm0 = StringVar()
-        self.box_adm0 = ttk.Combobox(finestra, textvariable = self.box_value_adm0)
+        self.box_adm0 = ttk.Combobox(finestra, textvariable=self.box_value_adm0)
         self.box_adm0['values'] = self.lista_paesi
         self.box_adm0.current(0)
-        self.box_adm0.place(x = 25 , y = 2, width=210, height=25)
+        self.box_adm0.place(x=25 , y = 2, width=210, height=25)
 
         #SECTION FOR FLOOD CALCULATION
         #SECTION FOR FLOOD CALCULATION
@@ -85,7 +85,9 @@ class AppSPARC:
                 else:
                     pass
 
+
         def attiva_disattiva():
+
             attivo_nonAttivo = self.var_check.get()
             print attivo_nonAttivo
             if attivo_nonAttivo == 0:
@@ -155,6 +157,7 @@ class AppSPARC:
         self.area_messaggi.insert(INSERT, "Data for " + paese + " Uploaded in DB")
 
     def world_calc_drought(self):
+
         paesi = self.lista_paesi
         for paese in paesi:
             self.national_calc_drought(paese)

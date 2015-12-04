@@ -169,4 +169,5 @@ def scateniamo_l_inferno(paese):
     liste_date = controlla_date(dati_raccolti[0], dati_raccolti[3], dati_raccolti[4], dati_raccolti[7])
     lista_mese_giorno = liste_date[0]
     il_file_generato = crea_file_avanzato(lista_anni_analisi, lista_mese_giorno)
+
     return il_file_generato

@@ -1,7 +1,8 @@
 from ecmwfapi import ECMWFDataServer
 server = ECMWFDataServer()
 
-import genera_date
+import calculate_time_window_date
+import extract_total_precipitation_hres
 
 import json
 import fiona
@@ -11,7 +12,12 @@ import os
 import sys
 gdal.UseExceptions()
 
-def caratteristiche_shp(file_shp):
+def Usage():
+
+    print("example run : $ python ecmwf_data_analysis.py country name")
+    sys.exit(1)
+
+def Shp_BBox(file_shp):
 
     ilVettore = fiona.open(file_shp)
     laProiezioneDelVettore = ilVettore.crs
@@ -26,43 +32,6 @@ def fetch_ECMWF_data(file_output, time_frame, area_richiesta):
     south = area_richiesta[1]
     east = area_richiesta[2]
     illo = str(north) + "/" + str(west) + "/" + str(south) + "/" + str(east)
-
-    # request FABIO
-    # server.retrieve({
-    #     "class": "s2",
-    #     "dataset": "s2s",
-    #     "date": "2015-01-01/to/2015-01-31",
-    #     "expver": "prod",
-    #     "levtype": "sfc",
-    #     "origin": "kwbc",
-    #     "param": "165",
-    #     "step": "24/to/1056/by/24",
-    #     "stream": "enfo",
-    #     "target": "temp1.grib",
-    #     "time": "00",
-    #     "number": "1/to/15",
-    #     "type": "cf",
-    #  })
-
-    # # request WFP
-    # server.retrieve({
-    #     "class": "ei",
-    #     "dataset": "interim",
-    #     "date": time_frame,
-    #     "expver": "1",
-    #     # "grid": "0.75/0.75",
-    #     "grid": "0.125/0.125",
-    #     "levtype": "sfc",
-    #     "param": "228.128",
-    #     "step": "12",
-    #     "stream": "oper",
-    #     # "area": "E",
-    #      "area" : illo,
-    #     "target": file_output,
-    #     # "format": "netcdf",
-    #     "time": "12",
-    #     "type": "fc",
-    # })
 
     # request WFP UN MESE ERA-Interim, Daily
     server.retrieve({
@@ -80,22 +49,6 @@ def fetch_ECMWF_data(file_output, time_frame, area_richiesta):
         "time": "12",
         "type": "fc",
     })
-
-    # # request WFP Hindcast 2015 November
-    # server.retrieve({
-    #     "class": "od",
-    #     "dataset": "interim",
-    #     "date": "=2015-05-11",
-    #     "expver": "67",
-    #     "grid": "0.125/0.125",
-    #     "levtype": "sfc",
-    #     "param": "228.128",
-    #     "step" : "0-24/0-72/0-120/0-240/0-360/12-36/12-84/12-132/24-48/24-96/24-144/36-60/36-108/36-156/48-72/48-120/48-168/60-84/60-132/60-180/72-96/72-144/72-192/84-108/84-156/84-204/96-120/96-168/96-216/108-132/108-180/108-228/120-144/120-192/132-156/132-204/144-168/144-216/156-180/156-228/240-360",
-    #     "stream" : "efhs",
-    #     "target": "gribs/test.grib",
-    #     "time": "00",
-    #     "type": "cd",
-    # })
 
 def apriRaster(raster):
     try:
@@ -122,17 +75,12 @@ def genera_statistiche_banda_grib(banda, indice):
     print "SCALE = ", banda.GetScale()
     print "UNIT TYPE = ", banda.GetUnitType()
 
-def Usage():
-
-    print("example run : $ python ecmwf_connect.py country name")
-    sys.exit(1)
-
 def genera_gribs(ritornato, vector_file, raster_file):
 
     date = open(ritornato)
     time_frame = json.load(date)
     print time_frame
-    proiezione, area_richiesta = caratteristiche_shp(vector_file)
+    proiezione, area_richiesta = Shp_BBox(vector_file)
     fetch_ECMWF_data(raster_file, time_frame, area_richiesta)
 
 def genera_means(file_path):
@@ -195,10 +143,14 @@ if __name__ == '__main__':
 
     vector_file = "c:/sparc/input_data/countries/" + sys.argv[1] + ".shp"
     paese = vector_file.split(".")[0].split("/")[-1]
-    ritornato = genera_date.scateniamo_l_inferno(paese)
+    ritornato = calculate_time_window_date.scateniamo_l_inferno(paese)
     parte_date = ritornato.split("/")[1].split(".")[0][4:]
     tre_lettere = vector_file.split(".")[0].split("/")[-1][0:3]
     raster_file = "gribs/historical/" + tre_lettere + parte_date + ".grib"
+
+    # CONNESSIONE A FTP SCARICO DATI E ESTRAZIONE BANDA PRECIPITAZIONE TOTALE
+    extract_total_precipitation_hres.FtpWork()
+    extract_total_precipitation_hres.estrazione_banda_TP_hres("ecmwf_ftp_wfp/A1D12020000121200001.grib","ecmwf_ftp_wfp/TP_0212")
 
     if os.path.isfile(raster_file):
         print "grib esiste"
