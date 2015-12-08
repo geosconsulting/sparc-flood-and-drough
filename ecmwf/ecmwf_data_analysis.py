@@ -2,7 +2,7 @@ from ecmwfapi import ECMWFDataServer
 server = ECMWFDataServer()
 
 import calculate_time_window_date
-import extract_total_precipitation_hres
+# import extract_total_precipitation_hres
 
 import json
 import fiona
@@ -25,26 +25,29 @@ def Shp_BBox(file_shp):
 
     return laProiezioneDelVettore, laBoundingBox
 
-def fetch_ECMWF_data(file_output, time_frame, area_richiesta):
+def fetch_ECMWF_data(file_output, time_frame, dict_area_richiesta):
 
-    north = area_richiesta[3]
-    west = area_richiesta[0]
-    south = area_richiesta[1]
-    east = area_richiesta[2]
-    illo = str(north) + "/" + str(west) + "/" + str(south) + "/" + str(east)
+    date = open(time_frame)
+    time_frame_json = json.load(date)
+
+    north = round(float(dict_area_richiesta['ymax'])*2/2)
+    west = round(float(dict_area_richiesta['xmin'])*2/2)
+    south = round(float(dict_area_richiesta['ymin'])*2/2)
+    east = round(float(dict_area_richiesta['xmax'])*2/2)
+    area_ecmwf_bbox = str(north) + "/" + str(west) + "/" + str(south) + "/" + str(east)
 
     # request WFP UN MESE ERA-Interim, Daily
     server.retrieve({
         "class": "ei",
         "dataset": "interim",
-        "date": time_frame,
+        "date": time_frame_json,
         "expver": "1931",
         "grid": "0.125/0.125",
         "levtype": "sfc",
         "param": "228.128",
         "step": "12",
         "stream": "mdfa",
-        "area": illo,
+        "area": area_ecmwf_bbox,
         "target": file_output,
         "time": "12",
         "type": "fc",
@@ -75,19 +78,21 @@ def genera_statistiche_banda_grib(banda, indice):
     print "SCALE = ", banda.GetScale()
     print "UNIT TYPE = ", banda.GetUnitType()
 
-def genera_gribs(ritornato, vector_file, raster_file):
+def genera_gribs(file_date, area_bbox, raster_file):
 
-    date = open(ritornato)
-    time_frame = json.load(date)
-    print time_frame
-    proiezione, area_richiesta = Shp_BBox(vector_file)
-    fetch_ECMWF_data(raster_file, time_frame, area_richiesta)
+    # date = open(file_date)
+    # time_frame = json.load(date)
+    # print time_frame
+    # # proiezione, area_richiesta = Shp_BBox(vector_file)
+    # area_richiesta = area_bbox
+    # fetch_ECMWF_data(raster_file, time_frame, area_richiesta)
+    pass
 
-def genera_means(file_path):
+def genera_means(file_path,parte_iso,parte_date):
 
         print "ECMWF file exists calculating statistics"
         print "Change the name of the output grib file for fetching new data"
-        nome_tif_mean = "calc/historical/mean_" + tre_lettere + parte_date + ".tif"
+        nome_tif_mean = "calc/historical/mean_" + parte_iso + parte_date + ".tif"
 
         ecmfwf_file_asRaster = gdal.Open(file_path)
         x_size =  ecmfwf_file_asRaster.RasterXSize
@@ -135,28 +140,29 @@ def analisi_raster_con_GDALNUMERICS(nome_tif_mean):
         mean_bande = banda_somma/numero_bande
         # PRIMO TENTATIVO CON GDALNUMERIC CREA SOLO MAGGIORE CONFUSIONE PREFERISCO ANDARE CON GDAL
 
-if __name__ == '__main__':
+# if __name__ == '__main__':
 
-    if len(sys.argv) < 1:
-        Usage()
-        sys.exit(1)
+    # if len(sys.argv) < 1:
+    #     Usage()
+    #     sys.exit(1)
+    #
+    # vector_file = "c:/sparc/input_data/countries/" + sys.argv[1] + ".shp"
+    # paese = vector_file.split(".")[0].split("/")[-1]
 
-    vector_file = "c:/sparc/input_data/countries/" + sys.argv[1] + ".shp"
-    paese = vector_file.split(".")[0].split("/")[-1]
-    ritornato = calculate_time_window_date.scateniamo_l_inferno(paese)
-    parte_date = ritornato.split("/")[1].split(".")[0][4:]
-    tre_lettere = vector_file.split(".")[0].split("/")[-1][0:3]
-    raster_file = "gribs/historical/" + tre_lettere + parte_date + ".grib"
+    # ritornato = calculate_time_window_date.scateniamo_l_inferno(paese)
+    # parte_date = ritornato.split("/")[1].split(".")[0][4:]
+    # tre_lettere = vector_file.split(".")[0].split("/")[-1][0:3]
+    # raster_file = "gribs/historical/" + tre_lettere + parte_date + ".grib"
+    # print raster_file
+    #
+    # if os.path.isfile(raster_file):
+    #     print "grib esiste"
+    #     genera_means(raster_file)
+    # else:
+    #     print "grib non esiste"
+    #     genera_gribs(ritornato, vector_file, raster_file)
+    #     genera_means(raster_file)
+    #
 
-    # CONNESSIONE A FTP SCARICO DATI E ESTRAZIONE BANDA PRECIPITAZIONE TOTALE
-    extract_total_precipitation_hres.FtpWork()
-    extract_total_precipitation_hres.estrazione_banda_TP_hres("ecmwf_ftp_wfp/A1D12020000121200001.grib","ecmwf_ftp_wfp/TP_0212")
-
-    if os.path.isfile(raster_file):
-        print "grib esiste"
-        genera_means(raster_file)
-    else:
-        print "grib non esiste"
-        genera_gribs(ritornato, vector_file, raster_file)
-        genera_means(raster_file)
-
+# dict = {'ymax': '15', 'xmin': '-90','ymin': '-20', 'xmax': '-65'}
+# fetch_ECMWF_data("c:/temp/tt1.grib",'dates/req_0817_12_19732012.txt',dict)

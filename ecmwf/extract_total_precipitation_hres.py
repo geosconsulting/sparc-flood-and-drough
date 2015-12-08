@@ -8,11 +8,27 @@ from ftplib import FTP
 gdal.UseExceptions()
 
 def FtpWork():
-    ftp = FTP('ftp.wfp.org')
-    ftp.login('WFP_GISviewer','FTPviewer')
-    # print ftp.getwelcome()
+
+    lista_files_ECMWF = []
+    lista_forecast = []
+
+    try:
+        ftp = FTP('ftp.wfp.org')
+        ftp.login('WFP_GISviewer','FTPviewer')
+        print ftp.getwelcome()
+    except:
+        pass
+
     # lista_files = ftp.retrlines('LIST')
+    # lista_files = ftp.dir()
+    for file in ftp.nlst():
+        filename, file_extension = os.path.splitext(file)
+        if file_extension == '' and len(file) == 20:
+
+            lista_files_ECMWF.append(filename)
     ftp.close()
+
+    return lista_files_ECMWF
 
 # Function to read the original file's projection:
 def GetGeoInfo(FileName):
@@ -76,11 +92,10 @@ def CreateGeoTiffFromSelectedBand(Name, Array, driver, NDV, xsize, ysize, GeoT, 
     return NewFileName
 
 
-def estrazione_banda_TP_hres(FileName,name_TP_tif_file):
+def EstrazioneBandaTP_hres(FileName, name_TP_tif_file):
 
     # FileName = "ecmwf_ftp_wfp/A1D12020000121200001.grib"
     # name_TP_tif_file = "ecmwf_ftp_wfp/TP_0212_2"
-
 
     DataSet = gdal.Open(FileName, GA_ReadOnly)
     # Get the first (and only) band.
@@ -107,5 +122,5 @@ def estrazione_banda_TP_hres(FileName,name_TP_tif_file):
 
     CreateGeoTiffFromSelectedBand(name_TP_tif_file, DataTP, driver, NDV, xsize, ysize, GeoT, Projection, DataTypeTPInt)
 
-
-# estrazione_banda_TP_hres("ecmwf_ftp_wfp/A1D12020000121200001.grib","ecmwf_ftp_wfp/TP_0212")
+# print FtpWork()
+# EstrazioneBandaTP_hres("ecmwf_ftp_wfp/A1D12020000121200001.grib","ecmwf_ftp_wfp/TP_0212")

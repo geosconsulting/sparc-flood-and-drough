@@ -41,7 +41,7 @@ def controlla_date(anno_inizio, mese_inizio, giorno_inizio, salto):
     lista_giorni = []
     data_iniziale = datetime.date(int(anno_inizio), int(mese_inizio), int(giorno_inizio))
 
-    salto_giorni = datetime.timedelta(days = salto)
+    salto_giorni = datetime.timedelta(days=salto+1)
     data_finale = data_iniziale + salto_giorni
 
      # MENO LEGGIBILE
@@ -64,7 +64,7 @@ def controlla_date(anno_inizio, mese_inizio, giorno_inizio, salto):
         lista_mese_giorno.append('{:02d}'.format(giorni_successivi.month) + "-" + '{:02d}'.format(giorni_successivi.day))
         lista_giorni.append(giorni_successivi)
 
-    return lista_mese_giorno, giorno_data_iniziale, mese_data_inziale, giorno_data_finale, mese_data_finale
+    return lista_mese_giorno #, giorno_data_iniziale, mese_data_inziale, giorno_data_finale, mese_data_finale
 
 def crea_file(anno_minimo, numero_anni, mese, giorno_inizio, giorno_fine):
 
@@ -164,10 +164,12 @@ def crea_file_avanzato(lista_anni, lista_giorni):
 
 def scateniamo_l_inferno(paese):
 
-    dati_raccolti = raccolta_parametri(paese)
-    lista_anni_analisi = dati_raccolti[6]
-    liste_date = controlla_date(dati_raccolti[0], dati_raccolti[3], dati_raccolti[4], dati_raccolti[7])
-    lista_mese_giorno = liste_date[0]
-    il_file_generato = crea_file_avanzato(lista_anni_analisi, lista_mese_giorno)
+    pass
 
-    return il_file_generato
+    # dati_raccolti = raccolta_parametri(paese)
+    # lista_anni_analisi = dati_raccolti[6]
+    # liste_date = controlla_date(dati_raccolti[0], dati_raccolti[3], dati_raccolti[4], dati_raccolti[7])
+    # lista_mese_giorno = liste_date[0]
+    # il_file_generato = crea_file_avanzato(lista_anni_analisi, lista_mese_giorno)
+    #
+    # return il_file_generato
