@@ -10,12 +10,11 @@ gdal.UseExceptions()
 def FtpWork():
 
     lista_files_ECMWF = []
-    lista_forecast = []
 
     try:
         ftp = FTP('ftp.wfp.org')
         ftp.login('WFP_GISviewer','FTPviewer')
-        print ftp.getwelcome()
+        messaggioServerFTP = str(ftp.getwelcome()) + "\n"
     except:
         pass
 
@@ -28,7 +27,7 @@ def FtpWork():
             lista_files_ECMWF.append(filename)
     ftp.close()
 
-    return lista_files_ECMWF
+    return messaggioServerFTP, lista_files_ECMWF
 
 # Function to read the original file's projection:
 def GetGeoInfo(FileName):

@@ -80,7 +80,7 @@ class AppECMWF:
         self.button_avg_forecasts = Button(finestra, text="Get Latest Forecast", fg="red", command = self.extract_precipitation_from_last_forecast)
         self.button_avg_forecasts.place(x=500, y=3, width=110, height=25)
 
-        self.area_oggi = Text(finestra, background="white", foreground="red")
+        self.area_oggi = Entry(finestra, background="white", foreground="red",)
         self.area_oggi.place(x=450, y=30, width=150, height=25)
         self.area_oggi.insert(INSERT, str(self.now.date()))
 
@@ -90,19 +90,19 @@ class AppECMWF:
 
         self.days_check = IntVar()
         self.check_3 = Radiobutton(finestra, text="3 Days",value = 3, variable = self.days_check)
-        self.check_3.place(x =450, y = 60, width=60, height=25)
+        self.check_3.place(x =450, y=60, width=60, height=25)
 
         self.days_5check = IntVar()
         self.check_5 = Radiobutton(finestra, text="5 Days",value = 5, variable = self.days_check)
-        self.check_5.place(x =520, y = 60, width=60, height=25)
+        self.check_5.place(x =520, y=60, width=60, height=25)
 
         self.days_7check = IntVar()
         self.check_7 = Radiobutton(finestra, text="7 Days", value = 7, variable = self.days_check)
-        self.check_7.place(x =450, y = 80, width=60, height=25)
+        self.check_7.place(x=450, y=80, width=60, height=25)
 
         self.days_10check = IntVar()
         self.check_10 = Radiobutton(finestra, text="10 Days", value = 10,variable = self.days_check)
-        self.check_10.place(x =520, y= 80, width=60, height=25)
+        self.check_10.place(x=520, y=80, width=60, height=25)
 
         self.box_value_minYear_current = StringVar()
         self.box_minYear_current = ttk.Combobox(finestra, textvariable= [], width=7)
@@ -185,16 +185,22 @@ class AppECMWF:
 
         raster_file = "gribs/historical/" + parte_iso + parte_date + ".grib"
         if os.path.isfile(raster_file):
-            print "grib esiste"
-            ecmwf_data_analysis.genera_means(raster_file)
+            self.area_messaggi.insert(INSERT, "Grib file exists")
+            self.area_messaggi.insert(INSERT, ecmwf_data_analysis.genera_means(raster_file))
         else:
-            print "grib non esiste"
+            self.area_messaggi.insert(INSERT,"Grib file does not exist")
             ecmwf_data_analysis.fetch_ECMWF_data(raster_file, file_date, self.dict_coords)
-            ecmwf_data_analysis.genera_means(raster_file,parte_iso, parte_date)
+            self.area_messaggi.insert(INSERT, ecmwf_data_analysis.genera_means(raster_file, parte_iso, parte_date))
 
     def extract_precipitation_from_last_forecast(self):
 
-       pass
+        self.listbox.delete(0, END)
+
+        messaggioFTP, files_disponibili = extract_total_precipitation_hres.FtpWork()
+        self.area_messaggi.insert(INSERT, messaggioFTP)
+        for file_disponibile in files_disponibili:
+            self.listbox.insert(END, file_disponibile)
+
 
 root = Tk()
 root.title("ECMWF Data Analysis")

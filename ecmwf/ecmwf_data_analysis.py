@@ -53,6 +53,8 @@ def fetch_ECMWF_data(file_output, time_frame, dict_area_richiesta):
         "type": "fc",
     })
 
+    return "Grib file generated in" + file_output + "\n"
+
 def apriRaster(raster):
     try:
         src_ds = gdal.Open(raster)
@@ -118,11 +120,12 @@ def genera_means(file_path,parte_iso,parte_date):
         raster_mean_from_bands = driver.Create(nome_tif_mean, x_size, y_size, 1, type_banda_esempio)
         gdalnumeric.CopyDatasetInfo(ecmfwf_file_asRaster, raster_mean_from_bands)
         banda_dove_scrivere_raster_mean = raster_mean_from_bands.GetRasterBand(1)
+
         try:
             gdalnumeric.BandWriteArray(banda_dove_scrivere_raster_mean, mean_bande_in_mm)
-            print "mean raster exported"
+            return "Mean raster exported in" + nome_tif_mean + "\n"
         except IOError as err:
-            print err.message
+            return str(err.message) + + "\n"
 
 def analisi_raster_con_GDALNUMERICS(nome_tif_mean):
 
