@@ -41,7 +41,7 @@ def genera_means(dir_base,lista_files, mese_min,mese_max):
 
         indice_in_processo = 1
         for file in lista_files:
-            print "Processando file numero %s" % indice_in_processo
+            print "Processando file numero %s nome %s" % (indice_in_processo,file)
             file_attivo = gdal.Open(dir_base + file)
             banda = file_attivo.GetRasterBand(1)           
             data = gdalnumeric.BandReadAsArray(banda)
