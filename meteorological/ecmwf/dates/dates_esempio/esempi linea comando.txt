@@ -1,0 +1,13 @@
+python ecmwf_connect.py honduras_oct2015.grib c:/sparc/input_data/countries/honduras.shp 2014-01-01 2014-12-31
+
+python ecmwf_connect.py bolivia_oct_2010_2014.grib c:/sparc/input_data/countries/bolivia.shp 0 0
+
+python ecmwf_connect.py colombia_nov_2005_2014.grib c:/sparc/input_data/countries/colombia.shp 0 0
+
+
+python ecmwf_connect.py col_17_24_nov_04_14.grib c:/sparc/input_data/countries/colombia.shp 0 0
+python ecmwf_connect.py ecu_17_24_nov_04_14.grib c:/sparc/input_data/countries/ecuador.shp 0 0
+python ecmwf_connect.py per_17_24_nov_04_14.grib c:/sparc/input_data/countries/peru.shp 0 0
+python ecmwf_connect.py bol_17_24_nov_04_14.grib c:/sparc/input_data/countries/bolivia.shp 0 0
+python ecmwf_connect.py par_17_24_nov_04_14.grib c:/sparc/input_data/countries/paraguay.shp 0 0
+
