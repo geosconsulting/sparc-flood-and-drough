@@ -1,5 +1,5 @@
 __author__ = 'fabio.lana'
-import csv
+import sys
 import os
 import glob
 import psycopg2
@@ -19,7 +19,7 @@ def insert_drought_in_postgresql(paese,lista_inserimento):
         return e.message
     cur = conn.cursor()
 
-    sql_clean = "DELETE FROM sparc_population_month_drought WHERE adm0_name = '"+ paese + "';"
+    sql_clean = "DELETE FROM sparc_population_month_drought WHERE adm0_name = '" + paese + "';"
     cur.execute(sql_clean)
     conn.commit()
 
@@ -54,18 +54,24 @@ def collect_drought_poplation_frequencies_frm_dbfs(direttorio):
             admin_code = direttorio_principale[linea_taglio:]
             files_dbf = glob.glob(direttorio_principale + "/*stat*.dbf")
             for file in files_dbf:
-                solo_file = file.split("\\")[-1]
-                month = os.path.splitext(solo_file)[0].split("_")[1]
-                unique_id = admin_name + "-" + admin_code + "-" + month
-                #print unique_id
                 try:
-                    tabella = dbf.Table(file)
-                    tabella.open()
-                    dct_valori_drought[unique_id] = {}
-                    for recordio in tabella:
-                        if recordio.value > 0:
-                            dct_valori_drought[unique_id][recordio['value']] = recordio['sum']
+                    solo_file = file.split("\\")[-1]
+                    month = os.path.splitext(solo_file)[0].split("_")[1]
+                    unique_id = admin_name + "-" + admin_code + "-" + month
+                    #print unique_id
+                    try:
+                        tabella = dbf.Table(file)
+                        tabella.open()
+                        dct_valori_drought[unique_id] = {}
+                        for recordio in tabella:
+                            if recordio.value > 0:
+                                dct_valori_drought[unique_id][recordio['value']] = recordio['sum']
+                    except:
+                        pass
                 except:
+                    e = sys.exc_info()[0]
+                    solo_file = file.split("\\")[-1]
+                    print e, str(solo_file)
                     pass
     return dct_valori_drought
 
@@ -122,17 +128,24 @@ def prepare_insert_statements_drought_monthly_values(paese, adms, dct_values_ann
             lista.append(risultati)
 
         dct_all_admin_values = {}
+        lista_proceso_conteggio = 0
         for indice in range(0, len(lista)):
-            radice_dct = lista[indice][0][6]
-            dct_all_admin_values[radice_dct] = {}
-            dct_all_admin_values[radice_dct]["iso3"] = str(lista[indice][0][0].strip())
-            dct_all_admin_values[radice_dct]["adm0_name"] = str(lista[indice][0][1].strip())
-            dct_all_admin_values[radice_dct]["adm0_code"] = str(lista[indice][0][2])
-            dct_all_admin_values[radice_dct]["adm1_code"] = str(lista[indice][0][3])
-            dct_all_admin_values[radice_dct]["adm1_name"] = str(lista[indice][0][4].strip())
-            dct_all_admin_values[radice_dct]["adm2_name"] = str(lista[indice][0][5].strip())
-            dct_all_admin_values[radice_dct]["adm2_code"] = str(lista[indice][0][6])
-
+            try:
+                radice_dct = lista[indice][0][6]
+                dct_all_admin_values[radice_dct] = {}
+                dct_all_admin_values[radice_dct]["iso3"] = str(lista[indice][0][0].strip())
+                dct_all_admin_values[radice_dct]["adm0_name"] = str(lista[indice][0][1].strip())
+                dct_all_admin_values[radice_dct]["adm0_code"] = str(lista[indice][0][2])
+                dct_all_admin_values[radice_dct]["adm1_code"] = str(lista[indice][0][3])
+                dct_all_admin_values[radice_dct]["adm1_name"] = str(lista[indice][0][4].strip())
+                dct_all_admin_values[radice_dct]["adm2_name"] = str(lista[indice][0][5].strip())
+                dct_all_admin_values[radice_dct]["adm2_code"] = str(lista[indice][0][6])
+                lista_proceso_conteggio += 1
+            except Exception as err:
+                e = sys.exc_info()[0]
+                radice = lista[indice]
+                lista_proceso_conteggio += 1
+                print e, radice, lista_proceso_conteggio
 
 
         linee =[]
@@ -164,13 +177,13 @@ def prepare_insert_statements_drought_monthly_values(paese, adms, dct_values_ann
 
         return lista, dct_all_admin_values,inserimento_mensili
 
-# paese = 'Benin'
-# PROJ_DIR = "c:/data/tools/sparc/projects/drought/"
-# dirOutPaese = PROJ_DIR + paese
-#
-# raccogli_da_files_anno = collect_drought_poplation_frequencies_frm_dbfs(dirOutPaese)
-# adms=set()
-# for chiave,valori in sorted(raccogli_da_files_anno.iteritems()):
-#     adms.add(chiave.split("-")[1])
-# raccolti_anno = prepare_insert_statements_drought_monthly_values(paese, adms, raccogli_da_files_anno)
-# insert_drought_in_postgresql(raccolti_anno[2])
+paese = 'Guatemala'
+PROJ_DIR = "c:/sparc/projects/drought/"
+dirOutPaese = PROJ_DIR + paese
+
+raccogli_da_files_anno = collect_drought_poplation_frequencies_frm_dbfs(dirOutPaese)
+adms=set()
+for chiave, valori in sorted(raccogli_da_files_anno.iteritems()):
+    adms.add(chiave.split("-")[1])
+raccolti_anno = prepare_insert_statements_drought_monthly_values(paese, adms, raccogli_da_files_anno)
+insert_drought_in_postgresql(paese, raccolti_anno[2])

@@ -7,7 +7,7 @@ import CompleteProcessingDrought as completeDrought
 from Tkinter import *
 import tkMessageBox
 import ttk
-import time
+
 
 class AppSPARC:
 
@@ -29,10 +29,10 @@ class AppSPARC:
 
         self.collect_codes_country_level()
         self.box_value_adm0 = StringVar()
-        self.box_adm0 = ttk.Combobox(finestra, textvariable = self.box_value_adm0)
+        self.box_adm0 = ttk.Combobox(finestra, textvariable=self.box_value_adm0)
         self.box_adm0['values'] = self.lista_paesi
         self.box_adm0.current(0)
-        self.box_adm0.place(x = 25 , y = 2, width=210, height=25)
+        self.box_adm0.place(x=25 , y = 2, width=210, height=25)
 
         #SECTION FOR FLOOD CALCULATION
         #SECTION FOR FLOOD CALCULATION
@@ -54,11 +54,11 @@ class AppSPARC:
         frame_drought.place(x = 305, y = 105, width=140, height=70)
 
         self.button_drought = Button(finestra, text="Drought Assessment", fg="maroon")
-        self.button_drought.place(x = 310, y = 110, width=130, height=25)
+        self.button_drought.place(x = 310, y= 110, width=130, height=25)
         self.button_drought.bind('<Button-1>', lambda scelta: scegli_calcolo("drought"))
 
         self.button_drought_upload = Button(finestra, text="Upload Data Manually", fg="maroon", command= self.drought_upload)
-        self.button_drought_upload.place(x = 310, y = 145, width=130, height=25)
+        self.button_drought_upload.place(x = 310, y= 145, width=130, height=25)
         #SECTION FOR DROUGHT CALCULATION
         #SECTION FOR DROUGHT CALCULATION
 
@@ -85,7 +85,9 @@ class AppSPARC:
                 else:
                     pass
 
+
         def attiva_disattiva():
+
             attivo_nonAttivo = self.var_check.get()
             print attivo_nonAttivo
             if attivo_nonAttivo == 0:
@@ -127,9 +129,9 @@ class AppSPARC:
             section_pop_raster_cut = newDroughtAssessment.cut_rasters_drought(paese,nome_admin, code_admin)
 
             if section_pop_raster_cut == "sipop":
-                self.area_messaggi.insert(INSERT,"Population clipped....")
+                self.area_messaggi.insert(INSERT , "Population clipped....")
             elif section_pop_raster_cut == "nopop":
-                self.area_messaggi.insert(INSERT,"Population raster not available....")
+                self.area_messaggi.insert(INSERT , "Population raster not available....")
                 sys.exit()
 
         dizio_drought = db_conn_drought.collect_drought_population_frequencies_frm_dbfs()
@@ -152,9 +154,10 @@ class AppSPARC:
 
         db_conn_drought.save_changes()
         db_conn_drought.close_connection()
-        self.area_messaggi.insert(INSERT, "Data for " + paese + " Uploaded in DB")
+        self.area_messaggi.insert(INSERT, "Data for " + paese + " Uploaded in DB\n")
 
     def world_calc_drought(self):
+
         paesi = self.lista_paesi
         for paese in paesi:
             self.national_calc_drought(paese)
@@ -205,7 +208,7 @@ class AppSPARC:
         for raccolto in raccogli_da_files_anno:
             adms.append(raccolto)
         raccolti_anno = fdup.process_dict_with_annual_values(paese, adms, raccogli_da_files_anno, fillolo)
-        fdup.inserisci_postgresql(paese,raccolti_anno[2])
+        fdup.inserisci_postgresql(paese, raccolti_anno[2])
         raccolti_mese = fdup.raccogli_mensili(fillolo)
         risultato = fdup.inserisci_postgresql(paese,raccolti_mese)
         self.area_messaggi.insert(INSERT, risultato)
