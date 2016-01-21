@@ -54,11 +54,11 @@ class AppSPARC:
         frame_drought.place(x = 305, y = 105, width=140, height=70)
 
         self.button_drought = Button(finestra, text="Drought Assessment", fg="maroon")
-        self.button_drought.place(x = 310, y = 110, width=130, height=25)
+        self.button_drought.place(x = 310, y= 110, width=130, height=25)
         self.button_drought.bind('<Button-1>', lambda scelta: scegli_calcolo("drought"))
 
         self.button_drought_upload = Button(finestra, text="Upload Data Manually", fg="maroon", command= self.drought_upload)
-        self.button_drought_upload.place(x = 310, y = 145, width=130, height=25)
+        self.button_drought_upload.place(x = 310, y= 145, width=130, height=25)
         #SECTION FOR DROUGHT CALCULATION
         #SECTION FOR DROUGHT CALCULATION
 
@@ -129,9 +129,9 @@ class AppSPARC:
             section_pop_raster_cut = newDroughtAssessment.cut_rasters_drought(paese,nome_admin, code_admin)
 
             if section_pop_raster_cut == "sipop":
-                self.area_messaggi.insert(INSERT,"Population clipped....")
+                self.area_messaggi.insert(INSERT , "Population clipped....")
             elif section_pop_raster_cut == "nopop":
-                self.area_messaggi.insert(INSERT,"Population raster not available....")
+                self.area_messaggi.insert(INSERT , "Population raster not available....")
                 sys.exit()
 
         dizio_drought = db_conn_drought.collect_drought_population_frequencies_frm_dbfs()
@@ -154,7 +154,7 @@ class AppSPARC:
 
         db_conn_drought.save_changes()
         db_conn_drought.close_connection()
-        self.area_messaggi.insert(INSERT, "Data for " + paese + " Uploaded in DB")
+        self.area_messaggi.insert(INSERT, "Data for " + paese + " Uploaded in DB\n")
 
     def world_calc_drought(self):
 
@@ -208,7 +208,7 @@ class AppSPARC:
         for raccolto in raccogli_da_files_anno:
             adms.append(raccolto)
         raccolti_anno = fdup.process_dict_with_annual_values(paese, adms, raccogli_da_files_anno, fillolo)
-        fdup.inserisci_postgresql(paese,raccolti_anno[2])
+        fdup.inserisci_postgresql(paese, raccolti_anno[2])
         raccolti_mese = fdup.raccogli_mensili(fillolo)
         risultato = fdup.inserisci_postgresql(paese,raccolti_mese)
         self.area_messaggi.insert(INSERT, risultato)
