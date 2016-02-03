@@ -270,7 +270,7 @@ class HazardAssessmentDrought(ProjectDrought):
                     try:
                         drought_out = self.proj_dir + paese + "/" + name_admin + "_" + str(code) + "/" + name_admin + "_drmo" + str(contatore) + ".tif"
                         self.adm2_drought_months.append(drought_out)
-                        arcpy.gp.ExtractByMask_sa(arcpy.Raster(rst_file), admin_vect, drought_out )
+                        arcpy.gp.ExtractByMask_sa(arcpy.Raster(rst_file), admin_vect, drought_out)
                         contatore += 1
                     except:
                         return "No Drought Raster"

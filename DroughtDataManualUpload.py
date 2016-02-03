@@ -177,7 +177,7 @@ def prepare_insert_statements_drought_monthly_values(paese, adms, dct_values_ann
 
         return lista, dct_all_admin_values,inserimento_mensili
 
-paese = 'Guatemala'
+paese = 'Peru'
 PROJ_DIR = "c:/sparc/projects/drought/"
 dirOutPaese = PROJ_DIR + paese
 

@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<module type="PYTHON_MODULE" version="4">
+  <component name="NewModuleRootManager">
+    <content url="file://$MODULE_DIR$">
+      <excludeFolder url="file://$MODULE_DIR$/AEW - SCRAM Workspace" />
+      <excludeFolder url="file://$MODULE_DIR$/SpaRC_Cyclones" />
+      <excludeFolder url="file://$MODULE_DIR$/ancillary" />
+      <excludeFolder url="file://$MODULE_DIR$/capra" />
+      <excludeFolder url="file://$MODULE_DIR$/conflicts" />
+      <excludeFolder url="file://$MODULE_DIR$/datoli" />
+      <excludeFolder url="file://$MODULE_DIR$/db_backup" />
+      <excludeFolder url="file://$MODULE_DIR$/ecmwf/forecasts" />
+      <excludeFolder url="file://$MODULE_DIR$/ecmwf/giovanni" />
+      <excludeFolder url="file://$MODULE_DIR$/ecmwf/gribs" />
+      <excludeFolder url="file://$MODULE_DIR$/ecmwf/rain" />
+      <excludeFolder url="file://$MODULE_DIR$/geoclim" />
+      <excludeFolder url="file://$MODULE_DIR$/input_data" />
+      <excludeFolder url="file://$MODULE_DIR$/intermedi/Learning Geospatial Analysis with Python" />
+      <excludeFolder url="file://$MODULE_DIR$/knime-workspace" />
+      <excludeFolder url="file://$MODULE_DIR$/meteorological/NDVI16DaysForDrought" />
+      <excludeFolder url="file://$MODULE_DIR$/meteorological/chirps" />
+      <excludeFolder url="file://$MODULE_DIR$/meteorological/ecmwf/anomalies" />
+      <excludeFolder url="file://$MODULE_DIR$/meteorological/ecmwf/calc" />
+      <excludeFolder url="file://$MODULE_DIR$/meteorological/ecmwf/ecmwf_ftp_wfp" />
+      <excludeFolder url="file://$MODULE_DIR$/meteorological/ecmwf/forecasts" />
+      <excludeFolder url="file://$MODULE_DIR$/meteorological/ecmwf/giovanni" />
+      <excludeFolder url="file://$MODULE_DIR$/meteorological/ecmwf/gribs" />
+      <excludeFolder url="file://$MODULE_DIR$/meteorological/ecmwf/panoply_exports" />
+      <excludeFolder url="file://$MODULE_DIR$/meteorological/ecmwf/rain" />
+      <excludeFolder url="file://$MODULE_DIR$/meteorological/ecmwf/rst_countries" />
+      <excludeFolder url="file://$MODULE_DIR$/meteorological/ecmwf/sde_files" />
+      <excludeFolder url="file://$MODULE_DIR$/meteorological/ecmwf/varie ed eventuali" />
+      <excludeFolder url="file://$MODULE_DIR$/meteorological/ecmwf/wfp_dir" />
+      <excludeFolder url="file://$MODULE_DIR$/meteorological/trmm_gpm/down_nasa_ftp" />
+      <excludeFolder url="file://$MODULE_DIR$/meteorological/trmm_gpm/gpm_test_data" />
+      <excludeFolder url="file://$MODULE_DIR$/meteorological/umd_edu" />
+      <excludeFolder url="file://$MODULE_DIR$/projects" />
+      <excludeFolder url="file://$MODULE_DIR$/sql" />
+      <excludeFolder url="file://$MODULE_DIR$/trmm_gpm/down_nasa_ftp" />
+      <excludeFolder url="file://$MODULE_DIR$/wings" />
+    </content>
+    <orderEntry type="jdk" jdkName="Python 2.7.5 (C:\Python27\ArcGIS10.2\python.exe)" jdkType="Python SDK" />
+    <orderEntry type="sourceFolder" forTests="false" />
+  </component>
+</module>
