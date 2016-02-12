@@ -103,7 +103,7 @@ class AppSPARC:
             if attivo_nonAttivo == 0 and scelta == 'landslide':
                 self.national_calc_landslide(paese)
             elif attivo_nonAttivo == 1 and scelta == 'landslide':
-                verifica = tkMessageBox.askyesno("Warning", "Non implementato!!!!")
+                verifica = tkMessageBox.askyesno("Warning", 'Non implementato!')
                 pass
                 # if verifica == True:
                 #     pass
@@ -126,7 +126,7 @@ class AppSPARC:
 
         self.var_check = IntVar()
         self.check_all = Checkbutton(finestra, text="All Countries", variable=self.var_check, command=attiva_disattiva)
-        self.check_all.place(x =310, y = 5, width=120, height=25)
+        self.check_all.place(x=310, y=5, width=120, height=25)
 
         finestra.mainloop()
 
@@ -197,11 +197,11 @@ class AppSPARC:
 
         raccogli_da_files_anno = ddup.collect_drought_poplation_frequencies_frm_dbfs(dirOutPaese)
         adms=set()
-        for chiave,valori in sorted(raccogli_da_files_anno.iteritems()):
+        for chiave, valori in sorted(raccogli_da_files_anno.iteritems()):
             adms.add(chiave.split("-")[1])
         raccolti_anno = ddup.prepare_insert_statements_drought_monthly_values(paese, adms, raccogli_da_files_anno)
-        risultato = ddup.insert_drought_in_postgresql(paese,raccolti_anno[2])
-        self.area_messaggi.insert(INSERT,risultato)
+        risultato = ddup.insert_drought_in_postgresql(paese, raccolti_anno[2])
+        self.area_messaggi.insert(INSERT, risultato)
 
     def national_calc_flood(self, paese):
 
@@ -288,7 +288,7 @@ class AppSPARC:
         pass
 
 root = Tk()
-root.title("SPARC Flood and Drought Assessment")
+root.title("SPARC Flood, Drought and Landslide Assessment")
 app = AppSPARC(root)
 
 

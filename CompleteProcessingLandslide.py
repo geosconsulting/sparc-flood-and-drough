@@ -279,7 +279,7 @@ class ManagePostgresDBLandslide(ProjectLandslide):
 
     def check_if_monthly_table_landslide_exists(self):
 
-        esiste_tabella = "SELECT '"+ self.schema + ".sparc_population_month_landslide'::regclass"
+        esiste_tabella = "SELECT '" + self.schema + ".sparc_population_month_landslide'::regclass"
         connection_string = "dbname=%s user=%s password=%s" % (self.dbname, self.user,self.password)
         conn_check = psycopg2.connect(connection_string)
         cur_check = conn_check.cursor()
@@ -373,7 +373,7 @@ class ManagePostgresDBLandslide(ProjectLandslide):
                         pass
         return dct_valori_landslide
 
-    def prepare_insert_statements_landslide_monthly_values(self,adms, dct_values_annual_landslide):
+    def prepare_insert_statements_landslide_monthly_values(self, adms, dct_values_annual_landslide):
 
         def associate_raster_to_month(val):
 
@@ -438,7 +438,7 @@ class ManagePostgresDBLandslide(ProjectLandslide):
             dct_all_admin_values[radice_dct]["adm2_code"] = str(lista[indice][0][6])
 
         linee =[]
-        for single_adm_chiavi,single_adm_value in sorted(dct_all_admin_values.iteritems()):
+        for single_adm_chiavi, single_adm_value in sorted(dct_all_admin_values.iteritems()):
             for adm2_landslide_keys, adm2_landslide_values in sorted(dct_values_annual_landslide.iteritems()):
                 val_adm = int(adm2_landslide_keys.split("-")[1])
                 if single_adm_chiavi == val_adm:

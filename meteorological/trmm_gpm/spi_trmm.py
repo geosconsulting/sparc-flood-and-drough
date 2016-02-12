@@ -5,7 +5,7 @@ import os, sys
 import Image, ImageDraw
 gdal.UseExceptions()
 
-def collect_prec_files_3b43(direttorio,mese_min, mese_max, anno):
+def collect_prec_files_3b43(direttorio, mese_min, mese_max, anno):
 
     lista_files_climatology = []
     lista_files_present = []

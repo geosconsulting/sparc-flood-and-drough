@@ -101,9 +101,9 @@ def plot_monthly_mean_wb(nome_paese, lista_valori):
         finale[mese] = valore
         mese += 1
 
-    # plt.plot(range(len(finale)), finale.values(), 'r-')
-    # plt.fill_between(range(len(finale)), finale.values(), facecolor='blue', alpha=0.5)
-    # plt.show()
+    plt.plot(range(len(finale)), finale.values(), 'b--')
+    plt.fill_between(range(len(finale)), finale.values(), facecolor='blue', alpha=0.5)
+    plt.show()
 
     return finale
 

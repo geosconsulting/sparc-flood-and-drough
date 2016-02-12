@@ -20,7 +20,7 @@ def historical_analysis_damages(paese):
 
         import collections
 
-        file_incidenti_in = open("c:/data/tools/sparc/input_data/historical_data/floods - refine.csv")
+        file_incidenti_in = open("c:/sparc/input_data/historical_data/floods - refine.csv")
         next(file_incidenti_in)
         mesi = []
         for linea in file_incidenti_in:
