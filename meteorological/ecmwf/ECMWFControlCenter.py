@@ -212,7 +212,7 @@ class AppECMWF:
 
             ecmwf_dir = "ecmwf_ftp_wfp/"
             file_ftp = ecmwf_dir + file_scelto
-            nome_file_estratto_TP = "ecmwf_ftp_wfp/TP_" + stringa1 + stringa2 + ".tif"
+            nome_file_estratto_TP = "ecmwf_ftp_wfp/TP_" + stringa1 + stringa2
 
             extract_total_precipitation_hres.FtpConnectionFilesRetrieval(ecmwf_dir, file_scelto)
             extract_total_precipitation_hres.EstrazioneBandaTP_hres(file_ftp, nome_file_estratto_TP)

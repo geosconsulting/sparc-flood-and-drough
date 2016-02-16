@@ -386,9 +386,13 @@ lista_isos = oggetto_isos.all_isos_db()
 #     except:
 #         pass
 
-scrapiamo = ScrapingEMDAT('GMT', 'Landslide')
-gar_paese = scrapiamo.scrape_GAR()
-print gar_paese
+scrapiamo = ScrapingEMDAT('LBN', 'Landslide')
+emdat_paese = scrapiamo.scrape_EMDAT()
+df_emdat_paese = pd.DataFrame(emdat_paese['data'])
+scrapiamo.write_in_db(df_emdat_paese)
+
+# gar_paese = scrapiamo.scrape_GAR()
+
 
 
 # FASE GEOCODING
