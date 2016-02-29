@@ -24,6 +24,12 @@ class AppECMWF:
 
         self.now = datetime.datetime.now()
         self.mese_inizio = self.now.month
+
+        # AREA MANIPOLAZIONE GIORNO NECESSARIO PER ANNI BISESTILI
+        # from datetime import timedelta
+        # giorno_aggiunta = timedelta(days=1)
+        # self.data_modificata = self.now.date() + giorno_aggiunta
+        # self.giorno_inizio = self.data_modificata.day
         self.giorno_inizio = self.now.day
 
         try:
@@ -79,22 +85,24 @@ class AppECMWF:
         self.button_latest_forecasts = Button(finestra, text="Calculate Mean of Forecasts", fg="red", command = self.calcola_mean_from_historical_forecasts)
         self.button_latest_forecasts.place(x=340, y=3, width=160, height=25)
 
-        self.button_avg_forecasts = Button(finestra, text="Get Latest Forecast", fg="red", command = self.extract_precipitation_from_last_forecast)
+        self.button_avg_forecasts = Button(finestra, text="Get Latest Forecast", fg="red", command=self.extract_precipitation_from_last_forecast)
         self.button_avg_forecasts.place(x=500, y=3, width=110, height=25)
 
         self.area_oggi = Entry(finestra, background="white", foreground="red",)
         self.area_oggi.place(x=450, y=30, width=150, height=25)
+
+        # self.area_oggi.insert(INSERT, str(self.data_modificata))
         self.area_oggi.insert(INSERT, str(self.now.date()))
 
         #Scelta anni minimo massimo per analisi corrente
         in_che_anno_siamo = self.now.year
-        lista_anni_correnti = list(range(1973, in_che_anno_siamo))
+        lista_anni_correnti = list(range(1979, in_che_anno_siamo))
 
         self.days_check = IntVar()
-        self.check_3 = Radiobutton(finestra, text="3 Days",value=3, variable=self.days_check)
-        self.check_3.place(x =450, y=60, width=60, height=25)
+        self.check_3 = Radiobutton(finestra, text="3 Days", value=3, variable=self.days_check)
+        self.check_3.place(x=450, y=60, width=60, height=25)
         self.check_5 = Radiobutton(finestra, text="5 Days", value=5, variable=self.days_check)
-        self.check_5.place(x =520, y=60, width=60, height=25)
+        self.check_5.place(x=520, y=60, width=60, height=25)
         self.check_7 = Radiobutton(finestra, text="7 Days", value=7, variable=self.days_check)
         self.check_7.place(x=450, y=80, width=60, height=25)
         self.check_10 = Radiobutton(finestra, text="10 Days", value=10, variable=self.days_check)
@@ -168,7 +176,7 @@ class AppECMWF:
         anno_massimo = self.box_maxYear_current.get()
         salto = self.days_check.get()
 
-        range_anni_scelti = range(int(anno_minimo), int(anno_massimo)+1)
+        range_anni_scelti = range(int(anno_minimo), int(anno_massimo))
         date_per_creazione_files = calculate_time_window_date.controlla_date(anno_minimo, self.mese_inizio, self.giorno_inizio, salto)
         file_date = calculate_time_window_date.crea_file_avanzato(range_anni_scelti, date_per_creazione_files)
 
@@ -177,12 +185,12 @@ class AppECMWF:
         parte_iso = ''.join(self.parte_3lettere_per_file_grib)
         parte_date = file_date.split(".")[0].split("req")[1]
 
-        raster_file = "gribs/historical/" + parte_iso + parte_date + ".grib"
+        raster_file = "0_gribs_from_ecmwf/historical/" + parte_iso + parte_date + ".grib"
         if os.path.isfile(raster_file):
             self.area_messaggi.insert(INSERT, "Grib file exists")
             self.area_messaggi.insert(INSERT, ecmwf_data_analysis.genera_means(raster_file))
         else:
-            self.area_messaggi.insert(INSERT,"Grib file does not exist")
+            self.area_messaggi.insert(INSERT, "Grib file does not exist")
             ecmwf_data_analysis.fetch_ECMWF_data(raster_file, file_date, self.dict_coords)
             self.area_messaggi.insert(INSERT, ecmwf_data_analysis.genera_means(raster_file, parte_iso, parte_date))
 
@@ -191,6 +199,10 @@ class AppECMWF:
         self.listbox.delete(0, END)
 
         messaggioFTP, files_disponibili = extract_total_precipitation_hres.FtpConnectionFilesGathering()
+
+        stringhe_da_cercare = calculate_time_window_date.controlla_date_ftp(self.box_minYear_current.get(), str(self.mese_inizio), self.giorno_inizio, self.days_check.get())
+
+
         if len(files_disponibili) > 0:
             self.area_messaggi.insert(INSERT, messaggioFTP)
             lista_ftp = []
@@ -198,10 +210,10 @@ class AppECMWF:
 
             if len(str(self.giorno_inizio)) < 2:
                 stringa1 = str(self.mese_inizio) + str('0' + (str(self.giorno_inizio)))
-                stringa2 = str(self.mese_inizio) + str(int(self.giorno_inizio+tempo_analisi))
+                stringa2 = str(self.mese_inizio) + str(int(self.giorno_inizio + tempo_analisi))
             else:
-                stringa1 = str(self.mese_inizio) + str(self.giorno_inizio)
-                stringa2 = str(self.mese_inizio) + str(int(self.giorno_inizio+tempo_analisi))
+                stringa1 = stringhe_da_cercare[1] + stringhe_da_cercare[0]
+                stringa2 = stringhe_da_cercare[3] + stringhe_da_cercare[2]
 
             for file_disponibile in files_disponibili:
                 lista_ftp.append(file_disponibile)
@@ -210,9 +222,9 @@ class AppECMWF:
                     file_scelto = file_disponibile
             self.area_messaggi.insert(INSERT, file_scelto)
 
-            ecmwf_dir = "ecmwf_ftp_wfp/"
+            ecmwf_dir = "2_ecmwf_ftp_wfp/"
             file_ftp = ecmwf_dir + file_scelto
-            nome_file_estratto_TP = "ecmwf_ftp_wfp/TP_" + stringa1 + stringa2
+            nome_file_estratto_TP = "2_ecmwf_ftp_wfp/TP_" + stringa1 + stringa2
 
             extract_total_precipitation_hres.FtpConnectionFilesRetrieval(ecmwf_dir, file_scelto)
             extract_total_precipitation_hres.EstrazioneBandaTP_hres(file_ftp, nome_file_estratto_TP)

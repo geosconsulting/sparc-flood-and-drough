@@ -64,7 +64,22 @@ def controlla_date(anno_inizio, mese_inizio, giorno_inizio, salto):
         lista_mese_giorno.append('{:02d}'.format(giorni_successivi.month) + "-" + '{:02d}'.format(giorni_successivi.day))
         lista_giorni.append(giorni_successivi)
 
-    return lista_mese_giorno #, giorno_data_iniziale, mese_data_inziale, giorno_data_finale, mese_data_finale
+    return lista_mese_giorno #,giorno_data_iniziale, mese_data_inziale, giorno_data_finale, mese_data_finale
+
+def controlla_date_ftp(anno_inizio, mese_inizio, giorno_inizio, salto):
+
+    data_iniziale = datetime.date(int(anno_inizio), int(mese_inizio), int(giorno_inizio))
+
+    # DA RIMUOVERE PASSATO FEBBRAIO
+    salto_giorni = datetime.timedelta(days=salto-1)
+    data_finale = data_iniziale + salto_giorni
+
+    giorno_data_iniziale = '{:02d}'.format(data_iniziale.day)
+    giorno_data_finale = '{:02d}'.format(data_finale.day)
+    mese_data_inziale = '{:02d}'.format(data_iniziale.month)
+    mese_data_finale = '{:02d}'.format(data_finale.month)
+
+    return giorno_data_iniziale, mese_data_inziale, giorno_data_finale, mese_data_finale
 
 def crea_file(anno_minimo, numero_anni, mese, giorno_inizio, giorno_fine):
 

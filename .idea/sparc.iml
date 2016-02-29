@@ -23,12 +23,12 @@
       <excludeFolder url="file://$MODULE_DIR$/meteorological/chirps/Nadine" />
       <excludeFolder url="file://$MODULE_DIR$/meteorological/chirps/climdata" />
       <excludeFolder url="file://$MODULE_DIR$/meteorological/chirps/lanina" />
+      <excludeFolder url="file://$MODULE_DIR$/meteorological/ecmwf/0_gribs" />
+      <excludeFolder url="file://$MODULE_DIR$/meteorological/ecmwf/1_mean" />
       <excludeFolder url="file://$MODULE_DIR$/meteorological/ecmwf/anomalies" />
-      <excludeFolder url="file://$MODULE_DIR$/meteorological/ecmwf/calc" />
       <excludeFolder url="file://$MODULE_DIR$/meteorological/ecmwf/ecmwf_ftp_wfp" />
       <excludeFolder url="file://$MODULE_DIR$/meteorological/ecmwf/forecasts" />
       <excludeFolder url="file://$MODULE_DIR$/meteorological/ecmwf/giovanni" />
-      <excludeFolder url="file://$MODULE_DIR$/meteorological/ecmwf/gribs" />
       <excludeFolder url="file://$MODULE_DIR$/meteorological/ecmwf/panoply_exports" />
       <excludeFolder url="file://$MODULE_DIR$/meteorological/ecmwf/rain" />
       <excludeFolder url="file://$MODULE_DIR$/meteorological/ecmwf/realtime_reforecast" />

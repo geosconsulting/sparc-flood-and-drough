@@ -25,7 +25,7 @@ print g.number_of_nodes()
 #     print node,g.degree(node)
 print nx.shortest_path(g,'c','n')
 
-shape = nx.read_shp(r"C:\data\tools\sparc\conflicts/GDELTSU.shp")
+shape = nx.read_shp(r"C:\sparc\input_data\wfp\facilities.shp")
 rete_shp = nx.DiGraph(shape)
 
 nx.draw(shape)
