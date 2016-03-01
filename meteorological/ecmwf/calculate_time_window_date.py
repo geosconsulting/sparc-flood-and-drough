@@ -3,24 +3,24 @@ import datetime
 
 def raccolta_parametri(iso):
 
-    range_anni = range(1979, 2015)
+    range_anni = range(1979, 2016)
     while True:
         anno_minimo = input("Starting Year: ")
         if anno_minimo in range_anni:
             print "Selected %d " % anno_minimo
             break
         else:
-            print "Year must be between 1979 and 2014"
+            print "Year must be between 1979 and 2015"
 
     while True:
-        anno_massimo = input("Ending Year (max 2014): ")
+        anno_massimo = input("Ending Year (max 2015): ")
         if anno_massimo in range_anni:
             print "Selected %d " % anno_massimo
             break
         else:
-            print "Year must be between 1979 and 2014"
+            print "Year must be between 1979 and 2015"
 
-    range_anni_scelti = range(anno_minimo,anno_massimo+1)
+    range_anni_scelti = range(anno_minimo, anno_massimo+1)
     # numero_anni = input("Number of Years : ")
     numero_anni = anno_massimo - anno_minimo
     print("Fetching data for %d years" % numero_anni)
@@ -86,7 +86,7 @@ def crea_file(anno_minimo, numero_anni, mese, giorno_inizio, giorno_fine):
     lista_anni = []
     lista_finale = []
     giorno_controllo = giorno_inizio
-    for anno_inizio in range(0, numero_anni):
+    for anno_inizio in range(0, numero_anni +1 ):
         lista_anni.append(anno_minimo + anno_inizio)
 
     for anno in lista_anni:
@@ -152,7 +152,7 @@ def crea_file_avanzato(lista_anni, lista_giorni):
         # print giorno_minimo, giorno_massimo
 
     anno_minimo = min(lista_anni)
-    anno_massimo = max(lista_anni)
+    anno_massimo = max(lista_anni) + 1
 
     prima_parte = str(giorno_minimo) + str(giorno_massimo)
     seconda_parte = str(anno_minimo) + str(anno_massimo)

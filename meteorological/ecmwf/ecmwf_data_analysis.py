@@ -39,21 +39,39 @@ def fetch_ECMWF_data(file_output, time_frame, dict_area_richiesta):
     print area_ecmwf_bbox
 
     # request WFP UN MESE ERA-Interim, Daily
+    # server.retrieve({
+    #     "class": "ei",
+    #     "dataset": "interim",
+    #     "date": time_frame_json,
+    #     # "date": "1979-02-18/to/2014-02-25",
+    #     "expver": "1931",
+    #     "grid": "0.125/0.125",
+    #     "levtype": "sfc",
+    #     "param": "228.128",
+    #     "step": "0",
+    #     "stream": "mdfa",
+    #     "area": area_ecmwf_bbox,
+    #     "target": file_output,
+    #     "time": "12",
+    #     # "time": "00/06/12/18",
+    #     "type": "fc",
+    # })
+
     server.retrieve({
         "class": "ei",
         "dataset": "interim",
         "date": time_frame_json,
-        # "date": "1979-02-18/to/2014-02-25",
-        "expver": "1931",
+        "expver": "1",
         "grid": "0.125/0.125",
         "levtype": "sfc",
         "param": "228.128",
-        "step": "0",
-        "stream": "mdfa",
+        "step": "24",
+        # "step": "12/to/240/by/24",
+        "stream": "oper",
         "area": area_ecmwf_bbox,
         "target": file_output,
-        "time": "12",
         # "time": "00/06/12/18",
+        "time": "12",
         "type": "fc",
     })
 
@@ -85,7 +103,7 @@ def fetch_ECMWF_data_manuale(time_frame,dict_area_richiesta):
         # "step": "12/to/240/by/24",
         "stream": "oper",
         "area": area_ecmwf_bbox,
-        "target": "test_4orari_3.grib",
+        "target": "0_gribs_from_ecmwf/historical/afr_s24_t12_mar_0111.grib",
         # "time": "00/06/12/18",
         "time": "12",
         "type": "fc",
@@ -115,8 +133,8 @@ def genera_statistiche_banda_grib(banda, indice):
     print "NO DATA VALUE = ", banda.GetNoDataValue()
     print "MIN = ", banda.GetMinimum()
     print "MAX = ", banda.GetMaximum()
-    print "SCALE = ", banda.GetScale()
-    print "UNIT TYPE = ", banda.GetUnitType()
+    # print "SCALE = ", banda.GetScale()
+    # print "UNIT TYPE = ", banda.GetUnitType()
 
 def genera_gribs(file_date, area_bbox, raster_file):
 
@@ -166,11 +184,10 @@ def genera_means(file_path, parte_iso, parte_date):
         except IOError as err:
             return str(err.message) + + "\n"
 
-def genera_means_ciclo10(file_path, parte_iso, parte_date):
+def genera_means_ciclo10(file_path, parte_iso, parte_date,anni):
+
 
         print "ECMWF file exists calculating statistics"
-        print "Change the name of the output grib file for fetching new data"
-        nome_tif_mean = "1_mean_from_gribs/mean_" + parte_iso + parte_date + ".tif"
 
         ecmfwf_file_asRaster = gdal.Open(file_path)
         x_size = ecmfwf_file_asRaster.RasterXSize
@@ -178,103 +195,75 @@ def genera_means_ciclo10(file_path, parte_iso, parte_date):
         numero_bande = ecmfwf_file_asRaster.RasterCount
 
         # print "Ci sono %d bande " % numero_bande
+
         banda_esempio = ecmfwf_file_asRaster.GetRasterBand(1)
         type_banda_esempio = banda_esempio.DataType
 
-        banda_somma = np.zeros((y_size, x_size,), dtype=np.float64)
-        for i in range(1, numero_bande):
-            punto_inizio = punto_inizio + 10
-            print
-            if punto_inizio>=740:
-                break
-            if punto_inizio == 10:
-                for prime_dieci in range(0, 11):
-                    numero = (punto_inizio-10) + prime_dieci
-                    print numero
+        # Write the out file
+        driver = gdal.GetDriverByName("GTiff")
 
-                    # banda = ecmfwf_file_asRaster.GetRasterBand(i)
-                    # # NON MI SERVE IN QUESTA FASE MA E' UTILE IN PROSPETTIVA
-                    # # genera_statistiche_banda_grib(banda, i)
-                    # data = gdalnumeric.BandReadAsArray(banda)
-                    # banda_somma = banda_somma + data
-                    # # mean_bande_in_mm = (banda_somma/numero_bande)*1000
-                    # # CONFRONTANDO FORECAST CON FORECAST NON HO BISOGNO DI AVERLO IN MILLIMETRI LASCIO TUTTO IN METRI
-                    # mean_bande = (banda_somma/10)
-                    #
-                    # # Write the out file
-                    # driver = gdal.GetDriverByName("GTiff")
-                    # raster_mean_from_bands = driver.Create(nome_tif_mean, x_size, y_size, 1, type_banda_esempio)
-                    # gdalnumeric.CopyDatasetInfo(ecmfwf_file_asRaster, raster_mean_from_bands)
-                    # banda_dove_scrivere_raster_mean = raster_mean_from_bands.GetRasterBand(1)
-                    #
-                    # try:
-                    #     gdalnumeric.BandWriteArray(banda_dove_scrivere_raster_mean, mean_bande)
-                    #     return "Mean raster exported in" + nome_tif_mean + "\n"
-                    # except IOError as err:
-                    #     return str(err.message) + + "\n"
+        conteggio = 0
 
+        for anno in anni:
+            indice = anni.index(anno) + 1
+            banda_somma_10gg = np.zeros((y_size, x_size,), dtype=np.float64)
+            # nome_tiff_cumulata = "1_mean_from_gribs/mar01_mar11/cum_" + str(indice) + "_" + str(anno) + ".tif"
+            # nome_tiff_average = "1_mean_from_gribs/mar01_mar11/avg_" + str(indice) + "_" + str(anno) + ".tif"
+            nome_tiff_cumulata = "1_mean_from_gribs/mar01_mar11/cum_" + parte_iso + "_" + str(indice) + "_" + str(anno)\
+                                 + "_" + parte_date + ".tif"
+            nome_tiff_average = "1_mean_from_gribs/mar01_mar11/mean_" + parte_iso + "_" + str(indice) + "_" + str(anno)\
+                                 + "_" + parte_date + ".tif"
+            # print nome_tiff_average
+            # print nome_tiff_cumulata
+            for giorno in range(1, 12):
+                numero_banda = conteggio + giorno
+                print "Sto lavorando sull'anno %d" % anno
+                # print giorno, anno
+                banda = ecmfwf_file_asRaster.GetRasterBand(numero_banda)
+                genera_statistiche_banda_grib(banda, numero_banda)
+                data = gdalnumeric.BandReadAsArray(banda)
+                cumulata_10gg = banda_somma_10gg + data
+                mean_10gg = (cumulata_10gg/11)
 
-            else:
-                for da10_a_740 in range(0, 11):
-                    numero = punto_inizio + da10_a_740
-                    print numero
+            raster_cum_from_bands = driver.Create(nome_tiff_cumulata, x_size, y_size, 1, type_banda_esempio)
+            gdalnumeric.CopyDatasetInfo(ecmfwf_file_asRaster, raster_cum_from_bands)
+            banda_dove_scrivere_raster_cum = raster_cum_from_bands.GetRasterBand(1)
 
-                    # banda = ecmfwf_file_asRaster.GetRasterBand(i)
-                    # # NON MI SERVE IN QUESTA FASE MA E' UTILE IN PROSPETTIVA
-                    # # genera_statistiche_banda_grib(banda, i)
-                    # data = gdalnumeric.BandReadAsArray(banda)
-                    # banda_somma = banda_somma + data
-                    # # mean_bande_in_mm = (banda_somma/numero_bande)*1000
-                    # # CONFRONTANDO FORECAST CON FORECAST NON HO BISOGNO DI AVERLO IN MILLIMETRI LASCIO TUTTO IN METRI
-                    # mean_bande = (banda_somma/10)
-                    #
-                    # # Write the out file
-                    # driver = gdal.GetDriverByName("GTiff")
-                    # raster_mean_from_bands = driver.Create(nome_tif_mean, x_size, y_size, 1, type_banda_esempio)
-                    # gdalnumeric.CopyDatasetInfo(ecmfwf_file_asRaster, raster_mean_from_bands)
-                    # banda_dove_scrivere_raster_mean = raster_mean_from_bands.GetRasterBand(1)
-                    #
-                    # try:
-                    #     gdalnumeric.BandWriteArray(banda_dove_scrivere_raster_mean, mean_bande)
-                    #     return "Mean raster exported in" + nome_tif_mean + "\n"
-                    # except IOError as err:
-                    #     return str(err.message) + + "\n"
+            raster_mean_from_bands = driver.Create(nome_tiff_average, x_size, y_size, 1, type_banda_esempio)
+            gdalnumeric.CopyDatasetInfo(ecmfwf_file_asRaster, raster_mean_from_bands)
+            banda_dove_scrivere_raster_mean = raster_mean_from_bands.GetRasterBand(1)
 
-        #     banda = ecmfwf_file_asRaster.GetRasterBand(i)
-        #     # NON MI SERVE IN QUESTA FASE MA E' UTILE IN PROSPETTIVA
-        #     # genera_statistiche_banda_grib(banda, i)
-        #     data = gdalnumeric.BandReadAsArray(banda)
-        #     banda_somma = banda_somma + data
-        # # mean_bande_in_mm = (banda_somma/numero_bande)*1000
-        # # CONFRONTANDO FORECAST CON FORECAST NON HO BISOGNO DI AVERLO IN MILLIMETRI LASCIO TUTTO IN METRI
-        # mean_bande_in_mm = (banda_somma/numero_bande)
+            try:
+                gdalnumeric.BandWriteArray(banda_dove_scrivere_raster_cum, cumulata_10gg)
+                gdalnumeric.BandWriteArray(banda_dove_scrivere_raster_mean, mean_10gg)
+                print "Raster calculated \n"
+            except IOError as err:
+                # return str(err.message) + + "\n"
+                print str(err.message) + + "\n"
 
+            raster_cum_from_bands = None
+            raster_mean_from_bands = None
 
+            conteggio += 11
+            # print
+        # print conteggio
 
 def analisi_raster_con_GDALNUMERICS(grib_file):
+
 
     grib_file_aperto = gdal.Open(grib_file, GA_ReadOnly)
 
     x_size = grib_file_aperto.RasterXSize
     y_size = grib_file_aperto.RasterYSize
-
-    # print x_size,y_size
-
     numero_bande = grib_file_aperto.RasterCount
 
-    # print numero_bande
-    # grib_file_aperto.GetRasterBand(0)
-
-    # contatore = 0
     for numero_banda in range(1, numero_bande+1):
         banda_corrente = grib_file_aperto.GetRasterBand(numero_banda)
         metadati = banda_corrente.GetMetadata()
-        if(metadati['GRIB_ELEMENT'] == 'TP'):
-            print metadati
-            # contatore += 1
+        # if(metadati['GRIB_ELEMENT'] == 'TP'):
+        #     print metadati
 
-    # print contatore
-
+    return x_size, y_size, numero_bande
 
 # if __name__ == '__main__':
 
@@ -300,12 +289,33 @@ def analisi_raster_con_GDALNUMERICS(grib_file):
     #     genera_means(raster_file)
     #
 
-dict = {'ymax': '-4', 'xmin': '12', 'ymin': '-18', 'xmax': '24'}
+# FOCUS ON AFRICA
+dict = {'ymax': '40', 'xmin': '-20', 'ymin': '-40', 'xmax': '60'}
+
 # fetch_ECMWF_data("0_gribs_from_ecmwf/ellolo.grib", 'dates/req_2607_02_03_19792015.txt', dict)
 
-# fetch_ECMWF_data_manuale('dates/req_2607_02_03_19792015.txt', dict)
+# fetch_ECMWF_data_manuale('dates/req_0111_03_19792016.txt', dict)
 
-# analisi_raster_con_GDALNUMERICS("test_4orari_3.grib")
+grib_file = "0_gribs_from_ecmwf/historical/afr_s24_t12_mar_0111.grib"
+
+numero_bande = analisi_raster_con_GDALNUMERICS(grib_file)[2]
+
+
+for numero_banda in range(1, numero_bande):
+    print "Sto lavorando sulla banda %d" % numero_banda
+    grib_file_aperto = gdal.Open(grib_file, GA_ReadOnly)
+    banda = grib_file_aperto.GetRasterBand(numero_banda)
+    genera_statistiche_banda_grib(banda, numero_banda)
+
+# print numero_bande
 
 # raster_file = "0218_0225.grib"
 # genera_means(raster_file, "fji", "1825_02_19792015")
+# anni = []
+# for anno in range(1979, 2016):
+#     anni.append(anno)
+
+# print anni
+# print len(anni)
+
+# genera_means_ciclo10(grib_file, "africa", "0111_03_19792015", anni)

@@ -176,7 +176,7 @@ class AppECMWF:
         anno_massimo = self.box_maxYear_current.get()
         salto = self.days_check.get()
 
-        range_anni_scelti = range(int(anno_minimo), int(anno_massimo))
+        range_anni_scelti = range(int(anno_minimo), int(anno_massimo)+1)
         date_per_creazione_files = calculate_time_window_date.controlla_date(anno_minimo, self.mese_inizio, self.giorno_inizio, salto)
         file_date = calculate_time_window_date.crea_file_avanzato(range_anni_scelti, date_per_creazione_files)
 

@@ -88,9 +88,11 @@ class ProjectStorms(object):
         #CUT and SAVE Population and Storms for each admin2 area
         pop_raster = arcpy.Raster(self.population_raster)
         desc_raster = arcpy.Describe(pop_raster)
+
         # print "Band Count:       %d" % desc_raster.bandCount
         # print "Compression Type: %s" % desc_raster.compressionType
         # print "Raster Format:    %s" % desc_raster.format
+
         if self.population_raster != "None":
             try:
                 pop_adm2_out = self.proj_dir + "/" + paese + "/" + admin_name + "_" + adm_code + "/" + adm_code + "_pop.tif"
@@ -109,7 +111,6 @@ class ProjectStorms(object):
                         print "No Storm Raster"
                     zs_pop_cat = self.proj_dir + "/" + paese + "/" + admin_name + "_" + adm_code + "/" + "zs_" + adm_code + "_" + str(nome_attivo) + ".dbf"
                     # Process: Zonal Statistics as Table
-                    #TODO Possibile catch del raster vuoto
                     try:
                         arcpy.GetRasterProperties_management(ciclone_taglio)
                         arcpy.gp.ZonalStatisticsAsTable_sa(ciclone_taglio, "Value", pop_taglio, zs_pop_cat, "DATA", "ALL")

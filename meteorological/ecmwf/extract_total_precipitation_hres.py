@@ -30,7 +30,7 @@ def FtpConnectionFilesGathering():
     return messaggioServerFTP, lista_files_ECMWF
 
 
-def FtpConnectionFilesRetrieval(ecmwf_dir,nomefile):
+def FtpConnectionFilesRetrieval(ecmwf_dir, nomefile):
 
     lista_files_ECMWF = []
 
