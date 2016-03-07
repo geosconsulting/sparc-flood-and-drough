@@ -15,7 +15,7 @@ def plot_mappa(paese):
         return ext
 
 
-    pathToRaster = "input_data/geocoded/risk_map/" + paese + ".tif"
+    pathToRaster = "c:/sparc/input_data/geocoded/risk_map/" + paese + ".tif"
     from mpl_toolkits.basemap import Basemap
     import matplotlib.pyplot as plt
     import numpy as np
@@ -45,4 +45,4 @@ def plot_mappa(paese):
 
     plt.show()
 
-#plot_mappa("India")
+plot_mappa("Colombia")

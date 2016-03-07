@@ -4,7 +4,7 @@ import pandas as pd
 from sqlalchemy import create_engine, MetaData
 import matplotlib.pyplot as plt
 import requests
-from pandas.io import wb
+# from pandas.io import wb
 import pycountry
 import numpy as np
 import csv
@@ -16,8 +16,8 @@ from intermedi.utilita import all_plots
 def richieste_wordlBank(iso3_paese):
 
     monthly_avg_1980_1999 = requests.get('http://climatedataapi.worldbank.org/climateweb/rest/v1/country/mavg/pr/1980/1999/' + iso3_paese)
-    monthly_anom_1980_1999 = requests.get('http://climatedataapi.worldbank.org/climateweb/rest/v1/country/mavg/pr/1980/1999/' + iso3_paese)
-    temperature_avg_1980_1999 = requests.get('http://climatedataapi.worldbank.org/climateweb/rest/v1/country/mavg/tas/1980/1999/' + iso3_paese)
+    # monthly_anom_1980_1999 = requests.get('http://climatedataapi.worldbank.org/climateweb/rest/v1/country/mavg/pr/1980/1999/' + iso3_paese)
+    # temperature_avg_1980_1999 = requests.get('http://climatedataapi.worldbank.org/climateweb/rest/v1/country/mavg/tas/1980/1999/' + iso3_paese)
 
     lista_valori_mensili_pioggia = []
     dct_valori_mensili_pioggia = {}
@@ -26,14 +26,14 @@ def richieste_wordlBank(iso3_paese):
     if monthly_avg_1980_1999.status_code == 200:
         risposta = monthly_avg_1980_1999.json()
         print risposta[0]
-        for valore_mensile in risposta[0]['monthVals']:
-            lista_valori_mensili_pioggia.append(valore_mensile)
-            dct_valori_mensili_pioggia[contatore] = valore_mensile
-            contatore += 1
+        # for valore_mensile in risposta[0]['monthVals']:
+        #     lista_valori_mensili_pioggia.append(valore_mensile)
+        #     dct_valori_mensili_pioggia[contatore] = valore_mensile
+        #     contatore += 1
     else:
         print "Connection failed"
 
-    return lista_valori_mensili_pioggia, dct_valori_mensili_pioggia, monthly_anom_1980_1999, temperature_avg_1980_1999
+    return lista_valori_mensili_pioggia, dct_valori_mensili_pioggia #, monthly_anom_1980_1999, temperature_avg_1980_1999
 
 def emdat_events(ip_in, table_name):
 
@@ -124,7 +124,7 @@ def main():
     # plt.show()
 
     ip_in = 'localhost'
-    iso = 'LBN'
+    iso = 'IND'
     oggetto_paese = pycountry.countries.get(alpha3=iso)
     paese_nome = oggetto_paese.name
 
@@ -157,44 +157,73 @@ def main():
     tabella = emdat_events(ip_in, table_name)
     if len(tabella) > 0:
         tabella['mese_fine'] = tabella['end_date'].str.split('/').str.get(1)
+        tabella['mese_fine'].replace('', 0, inplace=True)
+        tabella['mese_fine_int'] = tabella['mese_fine'].astype(np.int64)
+
         tabella['mese_inizio'] = tabella.start_date.str.split("/").str.get(1)
+        tabella['mese_inizio'].replace('', 0, inplace=True)
+        tabella['mese_inizio_int'] = tabella['mese_inizio'].astype(np.int64)
+
         conteggio = tabella['mese_fine'].value_counts()
         conteggio = conteggio.sort_index()
-        print conteggio
+        # print conteggio
         # conteggio.plot(kind='bar')
         # plt.title(paese_nome)
         # plt.show()
         tabella_solo_landslides = tabella.loc[tabella['dis_subtype'] == 'Landslide']
-        conteggio_solo_landslides = tabella_solo_landslides['mese_fine'].value_counts()
+        conteggio_solo_landslides = tabella_solo_landslides['mese_fine_int'].value_counts()
         conteggio_solo_landslides = conteggio_solo_landslides.sort_index()
-        print conteggio_solo_landslides
-        # conteggio_dict = dict(conteggio)
-        # for illo in conteggio_dict.iterkeys():
-        #     print illo
-        #
-        # print conteggio_dict
-
-        conteggio_solo_landslides.plot(kind='bar')
-        plt.title(paese_nome)
-        plt.show()
-        # tabella.to_csv(table_name+ ".csv")
+        # print conteggio_solo_landslides, type(conteggio_solo_landslides)
+        # print conteggio_solo_landslides.index
+        # conteggio_solo_landslides.plot(kind='bar')
+        # plt.title(paese_nome)
+        # plt.show()
+        # tabella.to_csv(table_name + ".csv")
     else:
         pass
 
+    conteggio_dict = dict(conteggio_solo_landslides)
+    for mese in range(1, 13):
+        if mese in conteggio_dict.iterkeys():
+            pass
+        else:
+            conteggio_dict[mese] = 0
+
+    conteggio_dict.pop('', None)
+    conteggio_dict.pop(0, None)
+    plt.grid(True)
+
+    # Plot y1 vs x in blue on the left vertical axis.
+    plt.xlabel("Months")
+    plt.ylabel("Historical Incidents related with LANDSLIDES EM-DAT", color="b")
+    plt.tick_params(axis="y", labelcolor="b")
+    plt.bar(range(len(conteggio_dict)), conteggio_dict.values(), align='center', color='g',label='Incidents')
+    plt.xticks(range(len(conteggio_dict)), conteggio_dict.keys())
+
+    # plt.twinx()
+    # plt.ylabel(labella_y, color="r")
+    # plt.tick_params(axis="y", labelcolor="r")
+    # plt.plot(range(len(list_ordered)), list_ordered.values(), 'r--')
+    # plt.xticks(range(len(list_ordered)), list_ordered.keys())
+
+    plt.title(iso)
+    plt.legend()
+    plt.show()
 
     table_rain_name = 'sparc_month_prec'
     tabella_rain = fao_prec_events(ip_in, table_rain_name)
-    if len(tabella_rain) > 0:
-        # print tabella_rain.head()
-        pioggia_adms2 = tabella_rain.loc[:, 'jan':]
-        # print pioggia_adms2.head()
-        # print pioggia_adms2.ix[3519]
-        # print pioggia_adms2.info()
-        # print pioggia_adms2.describe()
-        vuzzulo = pioggia_adms2.loc['22351']
-    else:
-        pass
 
+    # if len(tabella_rain) > 0:
+    #     # print tabella_rain.head()
+    #     pioggia_adms2 = tabella_rain.loc[:, 'jan':]
+    #     # print pioggia_adms2.head()
+    #     # print pioggia_adms2.ix[3519]
+    #     # print pioggia_adms2.info()
+    #     # print pioggia_adms2.describe()
+    #     vuzzulo = pioggia_adms2.loc['22351']
+    # else:
+    #     pass
+    #
     # valori_precipitazione_bancaMondiale_nazionale = richieste_wordlBank(iso)
     # print valori_precipitazione_bancaMondiale_nazionale[1]
 
@@ -207,10 +236,10 @@ def main():
 
     table_thresholds = 'sparc_landslides_thresholds'
     table_thresholds = scelta_equazione(ip_in, table_thresholds)
-    if len(table_thresholds) > 0:
-        print table_thresholds
-    else:
-        pass
+    # if len(table_thresholds) > 0:
+    #     print table_thresholds
+    # else:
+    #     pass
 
 if __name__ == "__main__":
     main()
