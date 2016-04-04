@@ -107,16 +107,20 @@ class AppECMWF:
         self.check_7.place(x=450, y=80, width=60, height=25)
         self.check_10 = Radiobutton(finestra, text="10 Days", value=10, variable=self.days_check)
         self.check_10.place(x=520, y=80, width=60, height=25)
+        self.check_30 = Radiobutton(finestra, text="30 Days", value=30, variable=self.days_check)
+        self.check_30.place(x=450, y=100, width=60, height=25)
+        self.check_46 = Radiobutton(finestra, text="46 Days", value=46, variable=self.days_check)
+        self.check_46.place(x=520, y=100, width=60, height=25)
 
         self.box_value_minYear_current = StringVar()
         self.box_minYear_current = ttk.Combobox(finestra, textvariable= [], width=7)
         self.box_minYear_current['values'] = lista_anni_correnti
-        self.box_minYear_current.place(x=450, y=115, width=155)
+        self.box_minYear_current.place(x=450, y=125, width=155)
 
         self.box_value_maxYear_current = StringVar()
         self.box_maxYear_current = ttk.Combobox(finestra, textvariable = [],width=7)
         self.box_maxYear_current['values'] = lista_anni_correnti
-        self.box_maxYear_current.place(x=450, y=140, width=155)
+        self.box_maxYear_current.place(x=450, y=150, width=155)
 
         # self.mesi = {'jan': 1, 'feb': 2, 'mar': 3, 'apr': 4, 'may': 5, 'jun': 6, 'jul': 7, 'aug': 8, 'sep': 9, 'oct': 10, 'nov': 11, 'dec': 12}
         # self.box_value_month = StringVar()

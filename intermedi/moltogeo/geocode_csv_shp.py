@@ -12,7 +12,7 @@ class GeocodeCsv(object):
 
     def __init__(self, paese):
         self.paese = paese
-        self.historical_table = "C:/data/tools/sparc/input_data/historical_data/floods - refine.csv"
+        self.historical_table = "C:/sparc/input_data/historical_data/floods - refine.csv"
         self.geolocator = Nominatim()
         self.geolocator_geonames = GeoNames(country_bias = self.paese, username='fabiolana', timeout=1)
 
@@ -38,8 +38,8 @@ class GeocodeCsv(object):
         successo = 0
         insuccesso = 0
 
-        geocoding_testo = open("c:/data/tools/sparc/input_data/geocoded/text/" + self.paese + ".txt", "wb+")
-        geocoding_testo_fail = open("c:/data/tools/sparc/input_data/geocoded/text/" + self.paese + "_fail.txt", "wb+")
+        geocoding_testo = open("c:/sparc/input_data/geocoded/text/" + self.paese + ".txt", "wb+")
+        geocoding_testo_fail = open("c:/sparc/input_data/geocoded/text/" + self.paese + "_fail.txt", "wb+")
 
         geocoding_testo.write("id,lat,lon\n")
         geocoding_testo_fail.write("id,lat,lon\n")
@@ -72,7 +72,7 @@ class GeocodeCsv(object):
 
             poligono = sf.bbox
             global poligono_controllo
-            poligono_controllo = ((poligono[2],poligono[1]), (poligono[2],poligono[3]), (poligono[0],poligono[3]), (poligono[0],poligono[1]))
+            poligono_controllo = ((poligono[2],poligono[1]), (poligono[2], poligono[3]), (poligono[0],poligono[3]), (poligono[0],poligono[1]))
             global n
             n = len(poligono_controllo)
 
@@ -96,14 +96,14 @@ class GeocodeCsv(object):
         def extract_country_shp():
 
             # Get the input Layer
-            inShapefile = "C:/data/tools/sparc/input_data/gaul/gaul_wfp_iso.shp"
+            inShapefile = "C:/sparc/input_data/gaul/gaul_wfp_iso.shp"
             inDriver = ogr.GetDriverByName("ESRI Shapefile")
             inDataSource = inDriver.Open(inShapefile, 0)
             inLayer = inDataSource.GetLayer()
             print "ADM0_NAME = '" + self.paese + "'"
             inLayer.SetAttributeFilter("ADM0_NAME = '" + self.paese + "'")
             # Create the output LayerS
-            outShapefile = "C:/data/tools/sparc/input_data/countries/" + self.paese + ".shp"
+            outShapefile = "C:/sparc/input_data/countries/" + self.paese + ".shp"
             outDriver = ogr.GetDriverByName("ESRI Shapefile")
 
             # Remove output shapefile if it already exists

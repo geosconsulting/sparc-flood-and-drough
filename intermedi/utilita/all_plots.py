@@ -16,6 +16,7 @@ def plot_affected(titolofinestra,nome_admin2,freq_people):
     plt.show()
 
 def build_value_list(list_val):
+
     la_lista_finale = {}
     for key, val in list_val.iteritems():
         if key == 'january':
@@ -84,13 +85,13 @@ def plot_monthly_danni(titolofinestra, labella_y, nome_admin2, list_ordered, lis
     plt.legend()
     plt.show()
 
-def plot_monthly_mean_wb(nome_paese, lista_valori):
+def plot_monthly_mean_wb(nome_paese, lista_valori,titolo):
 
     fig = pylab.gcf()
     fig.canvas.set_window_title(nome_paese)
 
     plt.grid(True)
-    plt.title("World Bank Historical Data on Precipitation")
+    plt.title(titolo)
     # Plot y1 vs x in blue on the left vertical axis.
     plt.xlabel("Months")
     plt.ylabel("Precipitation", color="r")
@@ -101,8 +102,8 @@ def plot_monthly_mean_wb(nome_paese, lista_valori):
         finale[mese] = valore
         mese += 1
 
-    plt.plot(range(len(finale)), finale.values(), 'b--')
-    plt.fill_between(range(len(finale)), finale.values(), facecolor='blue', alpha=0.5)
+    plt.plot(finale.keys(), finale.values(), 'r--')
+    plt.fill_between(finale.keys(), finale.values(), facecolor='red', alpha=0.2)
     plt.show()
 
     return finale
@@ -114,12 +115,12 @@ def plot_monthly_persone_danneggiate_finale(titolofinestra, labella_y, nome_admi
     plt.grid(True)
 
     mesi = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"]
-    plt.xlabel("Months",color="r")
+    plt.xlabel("Months", color="r")
     plt.ylabel("People possibly affected", color="r")
     plt.tick_params(axis="x", labelcolor="r")
     plt.tick_params(axis="y", labelcolor="r")
 
-    plt.plot(range(len(lista_tutti_rp['25'])), lista_tutti_rp['25'].values(),'bo-', markersize=8, label="25 Years")
+    plt.plot(range(len(lista_tutti_rp['25'])), lista_tutti_rp['25'].values(), 'bo-', markersize=8, label="25 Years")
     plt.plot(range(len(lista_tutti_rp['50'])), lista_tutti_rp['50'].values(), 'ro-', markersize=8, label="50 Years")
     plt.plot(range(len(lista_tutti_rp['100'])), lista_tutti_rp['100'].values(), 'go-', markersize=8, label="100 Years")
     plt.plot(range(len(lista_tutti_rp['200'])), lista_tutti_rp['200'].values(), 'yo-', markersize=8, label="200 Years")

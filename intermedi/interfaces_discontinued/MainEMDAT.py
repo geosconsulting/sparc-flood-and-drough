@@ -62,7 +62,7 @@ class AppSPARC_EMDAT:
         #OBJ_EMDAT.write_in_db(df_danni)
         #di_che_parliamo = richiesta.read_from_db(hazard)
 
-        eventi_by_coutry = df_danni.groupby('iso')
+        eventi_by_coutry = df_danni.groupby('ISO')
         df_paese = eventi_by_coutry.get_group(iso_paese)
         paese = df_paese.country_name[0]
         iso = df_paese.iso[0]

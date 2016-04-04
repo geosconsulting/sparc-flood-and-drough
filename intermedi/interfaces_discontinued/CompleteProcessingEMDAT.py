@@ -19,7 +19,7 @@ class ScrapingEMDAT(object):
     def __init__(self, hazard):
         self.continent = "Africa%27%2C%27Americas%27%2C%27Asia"
         self.hazard = hazard
-        self.stringa_richiesta = 'http://www.emdat.be/disaster_list/php/search.php?continent=' + self.continent + '&region=&iso=&from=1900&to=2015&group=&type=' + self.hazard
+        self.stringa_richiesta = 'http://www.emdat.be/disaster_list/php/search.php?continent=' + self.continent + '&region=&ISO=&from=1900&to=2015&group=&type=' + self.hazard
         self.engine = create_engine(r'postgresql://geonode:geonode@localhost/geonode-imports')
         self.connection = self.engine.connect()
         self.table_name = "sparc_emdat_scraping_" + hazard

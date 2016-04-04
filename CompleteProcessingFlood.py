@@ -67,7 +67,7 @@ class Progetto(object):
         #Unica directory merged vecchia versione
         #self.flood_aggregated = "C:/sparc/input_data/flood/merged/" + self.paese + "_all_rp_rcl.tif"
 
-        #Multi directories con iso name
+        #Multi directories con ISO name
         locazione_file = "C:/sparc/input_data/flood/gar15_ar/Flood/" + self.iso3 + "/" + self.iso3 + "_all_rp_rcl.tif"
         if os.path.isfile(locazione_file):
             self.flood_aggregated = locazione_file

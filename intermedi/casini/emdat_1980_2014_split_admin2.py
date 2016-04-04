@@ -91,7 +91,7 @@ for row in range(0,len(admin_n_name_lower)):
         unicode_pulito = no_bad_char.decode('latin1')
         admin_n_name_lower[row][item] = unicodedata.normalize('NFKD', unicode_pulito).encode('ascii', 'ignore')
 
-#LOAD the file with GAUL names + iso code
+#LOAD the file with GAUL names + ISO code
 def load_gaul_wfp_iso():
     gaul_wfp_iso = {}
     with open("gaul_wfp_iso.csv", 'rb') as f:
@@ -124,7 +124,7 @@ for row in range(0,len(gaul_wfp_iso_lower)):
         unicode_pulito = no_bad_char.decode('latin1')
         gaul_wfp_iso_lower[row][item] = unicodedata.normalize('NFKD', unicode_pulito).encode('ascii', 'ignore')
 
-#correct the iso code gadm using Fabio's table "gaul_wfp_iso"
+#correct the ISO code gadm using Fabio's table "gaul_wfp_iso"
 for i in range(0,len(admin_n_name_lower)):
     for j in range(0,len(gaul_wfp_iso_lower)):
         if admin_n_name_lower[i][11]==gaul_wfp_iso_lower[j][10]:

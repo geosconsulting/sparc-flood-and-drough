@@ -24,7 +24,7 @@ def sqlalch_connect(ip_in, table_name):
 def main():
 
 
-   # ip_in = socket.gethostbyname(socket.gethostname())
+   # IP_IN = socket.gethostbyname(socket.gethostname())
    ip_in = 'localhost'
    table_name = 'sparc_population_month_drought'
    print sqlalch_connect(ip_in,table_name)

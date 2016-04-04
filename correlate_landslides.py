@@ -70,7 +70,7 @@ def fao_servizio_coordinata(lat,lon):
     tutti_frutti = requests.get(stringola)
 
     soup = BeautifulSoup(tutti_frutti.text,"lxml")
-    table = soup.find("table", attrs={"class":"queryResults"})
+    table = soup.find("table", attrs={"class": "queryResults"})
     # tb_df = pd.read_html(stringola)
     # print table
 
@@ -114,7 +114,6 @@ def scelta_equazione(ip_in,table_thresholds):
 def main():
 
     # scelta_equazione()
-
     valori_ritornati = fao_servizio_coordinata("34.83", "31.17")
     # print valori_ritornati
     mesi = list(valori_ritornati.index)
@@ -124,7 +123,7 @@ def main():
     # plt.show()
 
     ip_in = 'localhost'
-    iso = 'IND'
+    iso = 'COL'
     oggetto_paese = pycountry.countries.get(alpha3=iso)
     paese_nome = oggetto_paese.name
 
@@ -154,7 +153,9 @@ def main():
     # plt.show()
 
     table_name = 'Landslide_' + iso
+    # table_name = 'central_africa'
     tabella = emdat_events(ip_in, table_name)
+    # print tabella
     if len(tabella) > 0:
         tabella['mese_fine'] = tabella['end_date'].str.split('/').str.get(1)
         tabella['mese_fine'].replace('', 0, inplace=True)
@@ -164,14 +165,14 @@ def main():
         tabella['mese_inizio'].replace('', 0, inplace=True)
         tabella['mese_inizio_int'] = tabella['mese_inizio'].astype(np.int64)
 
-        conteggio = tabella['mese_fine'].value_counts()
+        conteggio = tabella['mese_inizio_int'].value_counts()
         conteggio = conteggio.sort_index()
         # print conteggio
         # conteggio.plot(kind='bar')
         # plt.title(paese_nome)
         # plt.show()
         tabella_solo_landslides = tabella.loc[tabella['dis_subtype'] == 'Landslide']
-        conteggio_solo_landslides = tabella_solo_landslides['mese_fine_int'].value_counts()
+        conteggio_solo_landslides = tabella_solo_landslides['mese_inizio_int'].value_counts()
         conteggio_solo_landslides = conteggio_solo_landslides.sort_index()
         # print conteggio_solo_landslides, type(conteggio_solo_landslides)
         # print conteggio_solo_landslides.index
@@ -182,7 +183,7 @@ def main():
     else:
         pass
 
-    conteggio_dict = dict(conteggio_solo_landslides)
+    conteggio_dict = dict(conteggio)
     for mese in range(1, 13):
         if mese in conteggio_dict.iterkeys():
             pass
@@ -191,13 +192,15 @@ def main():
 
     conteggio_dict.pop('', None)
     conteggio_dict.pop(0, None)
+
+    print conteggio_dict
     plt.grid(True)
 
     # Plot y1 vs x in blue on the left vertical axis.
     plt.xlabel("Months")
     plt.ylabel("Historical Incidents related with LANDSLIDES EM-DAT", color="b")
     plt.tick_params(axis="y", labelcolor="b")
-    plt.bar(range(len(conteggio_dict)), conteggio_dict.values(), align='center', color='g',label='Incidents')
+    plt.bar(range(len(conteggio_dict)), conteggio_dict.values(), align='center', color='g', label='Incidents')
     plt.xticks(range(len(conteggio_dict)), conteggio_dict.keys())
 
     # plt.twinx()
@@ -206,7 +209,7 @@ def main():
     # plt.plot(range(len(list_ordered)), list_ordered.values(), 'r--')
     # plt.xticks(range(len(list_ordered)), list_ordered.keys())
 
-    plt.title(iso)
+    plt.title(table_name)
     plt.legend()
     plt.show()
 
@@ -220,22 +223,22 @@ def main():
     #     # print pioggia_adms2.ix[3519]
     #     # print pioggia_adms2.info()
     #     # print pioggia_adms2.describe()
-    #     vuzzulo = pioggia_adms2.loc['22351']
+    #     vuzzulo = pioggia_adms2.loc['40822']
     # else:
     #     pass
     #
-    # valori_precipitazione_bancaMondiale_nazionale = richieste_wordlBank(iso)
+    # valori_precipitazione_bancaMondiale_nazionale = richieste_wordlBank(ISO)
     # print valori_precipitazione_bancaMondiale_nazionale[1]
-
-    # ivaloraggi = all_plots.plot_monthly_mean_wb(iso, valori_precipitazione_bancaMondiale_nazionale[0], "World Bank Historical Precipitation")
-    # ivaloraggi1 = all_plots.plot_monthly_mean_wb(iso, vuzzulo, "FAO Historical Precipitation")
+    #
+    # # ivaloraggi = all_plots.plot_monthly_mean_wb(ISO, valori_precipitazione_bancaMondiale_nazionale[0], "World Bank Historical Precipitation")
+    # ivaloraggi1 = all_plots.plot_monthly_mean_wb(ISO, vuzzulo, "FAO Historical Precipitation")
 
     # dict_finale = all_plots.historical_analysis_damages(paese_nome)
     # labella_y = "Precipitation (mm) Real Time World Bank"
-    # all_plots.plot_monthly_danni("EM-DAT Registered Incidents", labella_y, iso, ivaloraggi, dict_finale)
+    # all_plots.plot_monthly_danni("EM-DAT Registered Incidents", labella_y, ISO, ivaloraggi, dict_finale)
 
-    table_thresholds = 'sparc_landslides_thresholds'
-    table_thresholds = scelta_equazione(ip_in, table_thresholds)
+    # table_thresholds = 'sparc_landslides_thresholds'
+    # table_thresholds = scelta_equazione(IP_IN, table_thresholds)
     # if len(table_thresholds) > 0:
     #     print table_thresholds
     # else:

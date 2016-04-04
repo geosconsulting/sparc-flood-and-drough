@@ -131,7 +131,7 @@ def becca_il_csv(paese_ricerca):
                 adm1_code = str(row[3]).strip()
                 adm2_code = str(row[4]).strip()
 
-            #print iso,adm0_name,adm0_code,adm1_code,adm2_code,admin
+            #print ISO,adm0_name,adm0_code,adm1_code,adm2_code,admin
             for file in files:
                 fileName, fileExtension = os.path.splitext(file)
                 if fileExtension == '.csv':

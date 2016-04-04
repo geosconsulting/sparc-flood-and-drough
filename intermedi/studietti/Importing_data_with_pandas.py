@@ -185,7 +185,7 @@ real_gdp.head()
 # In[25]:
 
 colspecs = [(0,10),(10,20)]
-real_gdp = pd.read_fwf('GDPC1.txt',colspecs=colspecs,skiprows=19,parse_dates=['DATE'],index_col=['DATE'])
+real_gdp = pd.read_fwf('GDPC1.txt', colspecs=colspecs, skiprows=19, parse_dates=['DATE'], index_col=['DATE'])
 real_gdp.head()
 
 

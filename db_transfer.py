@@ -36,7 +36,7 @@ def main():
         ip_out = sys.argv[2]
         table_name = sys.argv[3]
         print ip_in, ip_out, table_name
-        #sqlalch_connect(ip_in, ip_out, table_name)
+        #sqlalch_connect(IP_IN, ip_out, table_name)
 
 if __name__ == "__main__":
     main()

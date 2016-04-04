@@ -22,8 +22,8 @@ ogr.UseExceptions()
 class ScrapingEMDAT(object):
 
     def __init__(self, iso, hazard):
-        self.stringa_richiesta_gar = 'http://www.preventionweb.net/english/hyogo/gar/2015/en/home/data.php?iso=SLV'
-        self.stringa_richiesta = 'http://www.emdat.be/disaster_list/php/search.php?continent=&region=&iso=' + iso + '&from=1900&to=2015&group=&type=' + hazard
+        self.stringa_richiesta_gar = 'http://www.preventionweb.net/english/hyogo/gar/2015/en/home/data.php?ISO=SLV'
+        self.stringa_richiesta = 'http://www.emdat.be/disaster_list/php/search.php?continent=&region=&ISO=' + iso + '&from=1900&to=2015&group=&type=' + hazard
         self.engine = create_engine(r'postgresql://geonode:geonode@localhost/geonode-imports')
         self.connection = self.engine.connect()
         self.schema_emdat = 'em_dat'
@@ -357,15 +357,15 @@ class DataAnalysisHistoricalEMDAT(object):
 oggetto_isos = ManagePostgresDBEMDAT()
 lista_isos = oggetto_isos.all_isos_db()
 
-# for iso in lista_isos:
+# for ISO in lista_isos:
 #     try:
-#         paese = pycountry.countries.get(alpha3=iso)
-#         iso = paese.alpha3
+#         paese = pycountry.countries.get(alpha3=ISO)
+#         ISO = paese.alpha3
 #         nome_paese = paese.name
 #         print nome_paese
 #
 #         #Fase WebScraping
-#         scrapiamo = ScrapingEMDAT(iso, 'Landslide')
+#         scrapiamo = ScrapingEMDAT(ISO, 'Landslide')
 #         emdat_paese = scrapiamo.scrape_EMDAT()
 #         df_emdat_paese = pd.DataFrame(emdat_paese['data'])
 #         scrapiamo.write_in_db(df_emdat_paese)
