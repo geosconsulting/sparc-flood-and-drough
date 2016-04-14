@@ -24,8 +24,8 @@ import matplotlib.pyplot as plt
 #plt.show()
 
 temp1 = df.groupby('Pclass').Survived.count()
-temp2 = df.groupby('Pclass').Survived.sum()/ df.groupby('Pclass').Survived.count()
-fig1 = plt.figure(figsize=(8,4))
+temp2 = df.groupby('Pclass').Survived.sum() / df.groupby('Pclass').Survived.count()
+fig1 = plt.figure(figsize=(8, 4))
 
 ax1 = fig1.add_subplot(121)
 ax1.set_xlabel('Pclass')
@@ -76,7 +76,7 @@ def group_salutation(old_salutation):
           else:
              return('Others')
 
-df3 = pd.DataFrame({'New_Salutation':df['Salutation'].apply(group_salutation)})
+df3 = pd.DataFrame({'New_Salutation': df['Salutation'].apply(group_salutation)})
 df = pd.merge(df, df3, left_index = True, right_index = True)
 temp1 = df3.groupby('New_Salutation').count()
 print df

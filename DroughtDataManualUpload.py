@@ -177,13 +177,13 @@ def prepare_insert_statements_drought_monthly_values(paese, adms, dct_values_ann
 
         return lista, dct_all_admin_values,inserimento_mensili
 
-paese = 'Peru'
-PROJ_DIR = "c:/sparc/projects/drought/"
-dirOutPaese = PROJ_DIR + paese
-
-raccogli_da_files_anno = collect_drought_poplation_frequencies_frm_dbfs(dirOutPaese)
-adms=set()
-for chiave, valori in sorted(raccogli_da_files_anno.iteritems()):
-    adms.add(chiave.split("-")[1])
-raccolti_anno = prepare_insert_statements_drought_monthly_values(paese, adms, raccogli_da_files_anno)
-insert_drought_in_postgresql(paese, raccolti_anno[2])
+##paese = 'Peru'
+##PROJ_DIR = "c:/sparc/projects/drought/"
+##dirOutPaese = PROJ_DIR + paese
+##
+##raccogli_da_files_anno = collect_drought_poplation_frequencies_frm_dbfs(dirOutPaese)
+##adms=set()
+##for chiave, valori in sorted(raccogli_da_files_anno.iteritems()):
+##    adms.add(chiave.split("-")[1])
+##raccolti_anno = prepare_insert_statements_drought_monthly_values(paese, adms, raccogli_da_files_anno)
+##insert_drought_in_postgresql(paese, raccolti_anno[2])

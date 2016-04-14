@@ -16,6 +16,7 @@ env.overwriteOutput = "true"
 class ProjectLandslide(object):
 
     def __init__(self, dbname, user, password):
+        # type: (object, object, object) -> object
 
         self.proj_dir = "c:/sparc/projects/landslide/"
         self.shape_countries = "c:/sparc/input_data/gaul/gaul_wfp_iso.shp"
@@ -115,7 +116,6 @@ class ProjectLandslide(object):
         if os.path.exists(country_low):
             os.chdir(self.proj_dir + country_low)
             admin_low = admin_name.lower() + "_" + str(adm_code)
-            #print admin_low
             if os.path.exists(admin_low):
                 pass
             else:

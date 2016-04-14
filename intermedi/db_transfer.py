@@ -3,7 +3,7 @@ __author__ = 'fabio.lana'
 import pandas as pd
 from sqlalchemy import create_engine, MetaData
 import sys
-from IPy import IP
+from ipy import IP
 
 def sqlalch_connect(ip_in, ip_out, table_name):
 

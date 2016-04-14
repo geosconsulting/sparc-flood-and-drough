@@ -43,14 +43,12 @@ class ProjectDrought(object):
             print e.message
 
         self.cur = self.conn.cursor()
-
         self.drought_monthly_tifs_dir = "C:/sparc/input_data/drought/resampled_month/"
         self.drought_seasonal_tifs_dir = "C:/sparc/input_data/drought/resampled_seasonal/"
 
         os.chdir(self.drought_monthly_tifs_dir)
         self.drought_monthly_tifs = glob.glob("*.tif")
 
-        print(os.getcwd())
         os.chdir(self.drought_seasonal_tifs_dir)
         self.drought_seasonal_tifs = glob.glob("*.tif")
 
@@ -122,7 +120,6 @@ class ProjectDrought(object):
         if os.path.exists(country_low):
             os.chdir(self.proj_dir + country_low)
             admin_low = admin_name.lower() + "_" + str(adm_code)
-            #print admin_low
             if os.path.exists(admin_low):
                 pass
             else:
@@ -132,7 +129,6 @@ class ProjectDrought(object):
             os.mkdir(country_low)
             os.chdir(self.proj_dir + country_low)
             admin_low = admin_name.lower() + "_" + str(adm_code)
-            #print admin_low
             if os.path.exists(admin_low):
                 pass
             else:
@@ -211,7 +207,6 @@ class HazardAssessmentDrought(ProjectDrought):
 
         pop_out = arcpy.Raster(self.lscan_cut_adm2)
         scrivi_qui = arcpy.Describe(pop_out).path
-        print(scrivi_qui)
         scrivi_questo = str(pop_out).split("/")[5].split("_")[0]
         # one or both raster could be empty (no flood in polygon) I chech that
         sum_val_pop = int(arcpy.GetRasterProperties_management(pop_out, "UNIQUEVALUECOUNT")[0])
@@ -465,12 +460,10 @@ class ManagePostgresDBDrought(ProjectDrought):
 
         inserimento_mensili = []
         for linea in linee:
-            #print linea,len(linea)
             inserimento = "INSERT INTO public.sparc_population_month_drought" + \
                            " (iso3,adm0_name,adm0_code,adm1_name,adm1_code,adm2_code,adm2_name," \
                            "month, freq, pop)" \
                            "VALUES(" + linea + ");"
-            #print inserimento
             inserimento_mensili.append(inserimento)
 
         return lista, dct_all_admin_values ,inserimento_mensili
@@ -486,7 +479,6 @@ class ManagePostgresDBDrought(ProjectDrought):
     def insert_drought_in_postgresql(self, lista_inserimento):
 
         for ritornato in lista_inserimento:
-            #print ritornato
             self.cur.execute(ritornato)
 
     #########  COMMON TASKS   #########
