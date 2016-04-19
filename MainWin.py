@@ -9,7 +9,7 @@ import Correlation_GLCFAO
 from Tkinter import *
 import tkMessageBox
 import ttk
-
+import pycountry
 
 class AppSPARC:
     def __init__(self, finestra):
@@ -296,9 +296,34 @@ class AppSPARC:
 
     def landslide_correlate(self):
 
-        import pycountry
-        iso3 = pycountry.countries.get(name=self.box_value_adm0.get()).alpha3
+        nome_paese_per_iso = self.box_value_adm0.get()
+        print nome_paese_per_iso
+
+        if nome_paese_per_iso == "Bolivia":
+            nome_paese_per_iso = "Bolivia, Plurinational State of"
+        elif nome_paese_per_iso == "Democratic Republic of the Congo":
+            nome_paese_per_iso = "Congo, The Democratic Republic of the"
+        elif nome_paese_per_iso == "Iran":
+            nome_paese_per_iso = "Iran, Islamic Republic of"
+        elif nome_paese_per_iso == "Ivory Coast":
+            nome_paese_per_iso = u"Côte d'Ivoire"
+        elif nome_paese_per_iso == "Lao PDR":
+            nome_paese_per_iso = "Lao People's Democratic Republic"
+        elif nome_paese_per_iso == "Lao PDR":
+            nome_paese_per_iso = "Lao People's Democratic Republic"
+        elif nome_paese_per_iso == "Sao Tome and Principe":
+            nome_paese_per_iso = "Sao Tome and Principe"
+        elif nome_paese_per_iso == "Syria":
+            nome_paese_per_iso = "Syrian Arab Republic"
+        elif nome_paese_per_iso == "Tanzania":
+            nome_paese_per_iso = "Tanzania, United Republic of"
+
+        iso3 = pycountry.countries.get(name=nome_paese_per_iso).alpha3
         nuova_analisi = Correlation_GLCFAO.LandslideMonth(iso3)
+
+        # SCALA GLOBALE PAESE CON DATI EMDAT NON CODIFICATI E PIOGGIA TRMM AVG
+        # emdats, conteggio_emdats = nuova_analisi.emdat_events()
+        # rains_trmm = nuova_analisi.trmm_precipitation_country()
 
         # SCALA LOCALE PER AREE AMMINISTRATIVE E ADM2 CON DATI GLC DK E FAO/CHIRPS DA CENTROIDE
         glcs_tot = nuova_analisi.glc_events()
@@ -306,12 +331,12 @@ class AppSPARC:
 
         rains_tot = nuova_analisi.fao_prec_events()
         rains_country = rains_tot[rains_tot['iso3'] == iso3]
-
-        # SCALA GLOBALE PAESE CON DATI EMDAT NON CODIFICATI E PIOGGIA TRMM AVG
-        # emdats, conteggio_emdats = nuova_analisi.emdat_events()
-        # rains_trmm = nuova_analisi.trmm_precipitation_country()
-
-        nuova_analisi.correlazione(rains_country, glcs_country)
+        if rains_country.empty:
+            self.area_messaggi.insert(INSERT, "No montlhy distribution of precipitation...\n")
+            pass
+        else:
+            solo_valori_pioggia, eventi_gcl_adm2, mesi_numerici = nuova_analisi.preparazione_dataframes(rains_country, glcs_country)
+            dati_normalizzati = nuova_analisi.correlazione_su_dataframe(solo_valori_pioggia, eventi_gcl_adm2, mesi_numerici)
 
 
 root = Tk()
