@@ -19,10 +19,10 @@ class AppSPARC:
         self.password = "geonode"
         self.lista_amministrazioni = None
 
-        finestra.geometry("450x285+30+30")
+        finestra.geometry("450x310+30+30")
 
         self.area_messaggi = Text(finestra, background="black", foreground="green")
-        self.area_messaggi.place(x=18, y=30, width=282, height=245)
+        self.area_messaggi.place(x=18, y=30, width=282, height=275)
 
         self.scr = Scrollbar(finestra, command=self.area_messaggi.yview)
         self.scr.place(x=8, y=30, width=10, height=225)
@@ -67,7 +67,7 @@ class AppSPARC:
         # SECTION FOR LANDSLIDES CALCULATION
         # SECTION FOR LANDSLIDES CALCULATION
         frame_landslide = Frame(finestra, height=220, width=400, bg="orange")
-        frame_landslide.place(x=305, y=180, width=140, height=95)
+        frame_landslide.place(x=305, y=180, width=140, height=125)
 
         self.button_landslide = Button(finestra, text="Landslide Assessment", fg="black")
         self.button_landslide.place(x=310, y=185, width=130, height=25)
@@ -77,11 +77,14 @@ class AppSPARC:
                                               fg="black", command=self.landslide_upload)
         self.button_landslide_upload.place(x=310, y=215, width=130, height=25)
 
-        self.button_landslide_upload = Button(finestra, text="Montly Split",
+        self.button_landslide_upload = Button(finestra, text="Monthly Adm2",
                                               fg="black", command=self.landslide_correlate)
         self.button_landslide_upload.place(x=310, y=245, width=130, height=25)
 
-        # SECTION FOR LANDSLIDES CALCULATION
+        self.button_landslide_upload = Button(finestra, text="National Assessment",
+                                              fg="black", command=self.landslide_national)
+
+        self.button_landslide_upload.place(x=310, y=275, width=130, height=25)  # SECTION FOR LANDSLIDES CALCULATION
         # SECTION FOR LANDSLIDES CALCULATION
 
         def scegli_calcolo(scelta):
@@ -321,16 +324,13 @@ class AppSPARC:
         iso3 = pycountry.countries.get(name=nome_paese_per_iso).alpha3
         nuova_analisi = Correlation_GLCFAO.LandslideMonth(iso3)
 
-        # SCALA GLOBALE PAESE CON DATI EMDAT NON CODIFICATI E PIOGGIA TRMM AVG
-        # emdats, conteggio_emdats = nuova_analisi.emdat_events()
-        # rains_trmm = nuova_analisi.trmm_precipitation_country()
-
         # SCALA LOCALE PER AREE AMMINISTRATIVE E ADM2 CON DATI GLC DK E FAO/CHIRPS DA CENTROIDE
         glcs_tot = nuova_analisi.glc_events()
         glcs_country = glcs_tot[glcs_tot['iso3'] == iso3]
 
         rains_tot = nuova_analisi.fao_prec_events()
         rains_country = rains_tot[rains_tot['iso3'] == iso3]
+
         if rains_country.empty:
             self.area_messaggi.insert(INSERT, "No montlhy distribution of precipitation...\n")
             pass
@@ -338,6 +338,38 @@ class AppSPARC:
             solo_valori_pioggia, eventi_gcl_adm2, mesi_numerici = nuova_analisi.preparazione_dataframes(rains_country, glcs_country)
             dati_normalizzati = nuova_analisi.correlazione_su_dataframe(solo_valori_pioggia, eventi_gcl_adm2, mesi_numerici)
 
+    def landslide_national(self):
+
+        nome_paese_per_iso = self.box_value_adm0.get()
+        print nome_paese_per_iso
+
+        if nome_paese_per_iso == "Bolivia":
+            nome_paese_per_iso = "Bolivia, Plurinational State of"
+        elif nome_paese_per_iso == "Democratic Republic of the Congo":
+            nome_paese_per_iso = "Congo, The Democratic Republic of the"
+        elif nome_paese_per_iso == "Iran":
+            nome_paese_per_iso = "Iran, Islamic Republic of"
+        elif nome_paese_per_iso == "Ivory Coast":
+            nome_paese_per_iso = u"Côte d'Ivoire"
+        elif nome_paese_per_iso == "Lao PDR":
+            nome_paese_per_iso = "Lao People's Democratic Republic"
+        elif nome_paese_per_iso == "Lao PDR":
+            nome_paese_per_iso = "Lao People's Democratic Republic"
+        elif nome_paese_per_iso == "Sao Tome and Principe":
+            nome_paese_per_iso = "Sao Tome and Principe"
+        elif nome_paese_per_iso == "Syria":
+            nome_paese_per_iso = "Syrian Arab Republic"
+        elif nome_paese_per_iso == "Tanzania":
+            nome_paese_per_iso = "Tanzania, United Republic of"
+
+        iso3 = pycountry.countries.get(name=nome_paese_per_iso).alpha3
+        nuova_analisi = Correlation_GLCFAO.LandslideMonth(iso3)
+
+        rains_trmm = nuova_analisi.trmm_precipitation_country()
+        glcs_tot = nuova_analisi.glc_events()
+        glcs_country = glcs_tot[glcs_tot['iso3'] == iso3]
+
+        nuova_analisi.national_assessment(glcs_country, rains_trmm)
 
 root = Tk()
 root.title("SPARC Flood, Drought and Landslide Assessment")
