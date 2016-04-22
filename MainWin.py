@@ -1,10 +1,10 @@
-#!/usr/bin/python
 # -*- coding: utf-8 -*-
 __author__ = 'fabio.lana'
 
 import CompleteProcessingDrought as completeDrought
 import CompleteProcessingLandslide as completeLandslide
 import Correlation_GLCFAO
+
 
 from Tkinter import *
 import tkMessageBox
@@ -199,6 +199,7 @@ class AppSPARC:
     def drought_upload(self):
 
         paese = self.box_value_adm0.get()
+        
         import DroughtDataManualUpload as ddup
 
         proj_dir = "c:/data/tools/sparc/projects/drought/"
@@ -370,6 +371,7 @@ class AppSPARC:
         glcs_country = glcs_tot[glcs_tot['iso3'] == iso3]
 
         nuova_analisi.national_assessment(glcs_country, rains_trmm)
+
 
 root = Tk()
 root.title("SPARC Flood, Drought and Landslide Assessment")
