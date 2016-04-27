@@ -84,7 +84,8 @@ class AppSPARC:
         self.button_landslide_upload = Button(finestra, text="National Assessment",
                                               fg="black", command=self.landslide_national)
 
-        self.button_landslide_upload.place(x=310, y=275, width=130, height=25)  # SECTION FOR LANDSLIDES CALCULATION
+        self.button_landslide_upload.place(x=310, y=275, width=130, height=25)
+        # SECTION FOR LANDSLIDES CALCULATION
         # SECTION FOR LANDSLIDES CALCULATION
 
         def scegli_calcolo(scelta):
@@ -134,7 +135,7 @@ class AppSPARC:
                 self.button_drought_upload.config(state='disabled')
 
         self.var_check = IntVar()
-        self.check_all = Checkbutton(finestra, text="All Countries", variable=self.var_check, command=attiva_disattiva)
+        self.check_all = Checkbutton(finestra, text="All Countries", variable= self.var_check, command=attiva_disattiva)
         self.check_all.place(x=310, y=5, width=120, height=25)
 
         finestra.mainloop()
@@ -188,7 +189,7 @@ class AppSPARC:
 
         db_conn_drought.save_changes()
         db_conn_drought.close_connection()
-        self.area_messaggi.insert(INSERT, "Data for " + paese + " Uploaded in DB\n")
+        self.area_messaggi.insert(INSERT, "Data for " + paese + " Uploaded in database\n")
 
     def world_calc_drought(self):
 
@@ -199,7 +200,7 @@ class AppSPARC:
     def drought_upload(self):
 
         paese = self.box_value_adm0.get()
-        
+
         import DroughtDataManualUpload as ddup
 
         proj_dir = "c:/data/tools/sparc/projects/drought/"
@@ -325,7 +326,8 @@ class AppSPARC:
         iso3 = pycountry.countries.get(name=nome_paese_per_iso).alpha3
         nuova_analisi = Correlation_GLCFAO.LandslideMonth(iso3)
 
-        # SCALA LOCALE PER AREE AMMINISTRATIVE E ADM2 CON DATI GLC DK E FAO/CHIRPS DA CENTROIDE
+#       SCALA LOCALE PER AREE AMMINISTRATIVE E ADM2
+#       CON DATI GLC DK E FAO/CHIRPS DA CENTROIDE
         glcs_tot = nuova_analisi.glc_events()
         glcs_country = glcs_tot[glcs_tot['iso3'] == iso3]
 
@@ -333,7 +335,8 @@ class AppSPARC:
         rains_country = rains_tot[rains_tot['iso3'] == iso3]
 
         if rains_country.empty:
-            self.area_messaggi.insert(INSERT, "No montlhy distribution of precipitation...\n")
+            self.area_messaggi.insert(INSERT,
+                "No montlhy distribution of precipitation...\n")
             pass
         else:
             solo_valori_pioggia, eventi_gcl_adm2, mesi_numerici = nuova_analisi.preparazione_dataframes(rains_country, glcs_country)
@@ -342,7 +345,6 @@ class AppSPARC:
     def landslide_national(self):
 
         nome_paese_per_iso = self.box_value_adm0.get()
-        print nome_paese_per_iso
 
         if nome_paese_per_iso == "Bolivia":
             nome_paese_per_iso = "Bolivia, Plurinational State of"
@@ -364,14 +366,27 @@ class AppSPARC:
             nome_paese_per_iso = "Tanzania, United Republic of"
 
         iso3 = pycountry.countries.get(name=nome_paese_per_iso).alpha3
+        print iso3
         nuova_analisi = Correlation_GLCFAO.LandslideMonth(iso3)
 
         rains_trmm = nuova_analisi.trmm_precipitation_country()
         glcs_tot = nuova_analisi.glc_events()
         glcs_country = glcs_tot[glcs_tot['iso3'] == iso3]
 
-        nuova_analisi.national_assessment(glcs_country, rains_trmm)
+        corr_nazionale = nuova_analisi.national_assessment(glcs_country, rains_trmm)
+        corr_nazionale = corr_nazionale.set_index(['mese'])
 
+        nazione = corr_nazionale.loc[1:,'adm0_name']
+        iso = corr_nazionale.loc[1:,'adm0_code']
+
+        print("Il paese e' %s e il suo ISO e' %s" % (nazione[1],iso[1]))
+
+        for x in range(1,13):
+            corr_nazionale_subset = corr_nazionale.loc[x:x+1,'d3_n':'ev_n']                  
+            #print(corr_nazionale_subset[1:])
+            corr_nazionale_trans = corr_nazionale_subset[0:1].transpose()
+            print(corr_nazionale_trans)
+            corr_nazionale_trans.to_csv()
 
 root = Tk()
 root.title("SPARC Flood, Drought and Landslide Assessment")

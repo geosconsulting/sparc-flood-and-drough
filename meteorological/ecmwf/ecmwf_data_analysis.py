@@ -61,6 +61,7 @@ def fetch_ECMWF_data(file_output, time_frame, dict_area_richiesta):
         "class": "ei",
         "dataset": "interim",
         "date": time_frame_json,
+        # "date": "2016-04-25",
         "expver": "1",
         "grid": "0.125/0.125",
         "levtype": "sfc",
@@ -77,7 +78,7 @@ def fetch_ECMWF_data(file_output, time_frame, dict_area_richiesta):
 
     return "Grib file generated in" + file_output + "\n"
 
-def fetch_ECMWF_data_manuale(time_frame,dict_area_richiesta):
+def fetch_ECMWF_data_manuale(time_frame, dict_area_richiesta):
 
     date = open(time_frame)
     time_frame_json = json.load(date)
@@ -92,21 +93,23 @@ def fetch_ECMWF_data_manuale(time_frame,dict_area_richiesta):
     # IL QUARTO GRIB SOMMA 10 GIORNI CON STEP 24 ORE E USA TIME A ZERO
     server.retrieve({
         "class": "ei",
+        #"class": "od",
         "dataset": "interim",
-        "date": time_frame_json,
-        # "date": "1979-02-18/to/2014-02-25",
+        # "date": time_frame_json,
+        # "date": "2016-04-25",
+        "date": "2016-04-25",
         "expver": "1",
         "grid": "0.125/0.125",
         "levtype": "sfc",
-        "param": "228.128",
-        # "step": "24",
+        # "param": "228.128",
+        "step": "24",
         # "step": "12/to/240/by/24",
-        "step": "0/to/240/by/240",
+        # "step": "0/to/240/by/240",
         "stream": "oper",
         "area": area_ecmwf_bbox,
-        "target": "0_gribs_from_ecmwf/historical/afr_s24_th12_mar_2231_240.grib",
+        "target": "0_gribs_from_ecmwf/historical/eth_ultimo_aprmay_2503.grib",
         # "time": "00/06/12/18",
-        "time": "12",
+        "time": "0",
         "type": "fc",
     })
 
@@ -223,6 +226,7 @@ def genera_means(file_path, parte_iso, parte_date):
             # genera_statistiche_banda_grib(banda, i)
             data = gdalnumeric.BandReadAsArray(banda)
             banda_somma = banda_somma + data
+
         # mean_bande_in_mm = (banda_somma/numero_bande)*1000
         # CONFRONTANDO FORECAST CON FORECAST NON HO BISOGNO DI AVERLO IN MILLIMETRI LASCIO TUTTO IN METRI
         mean_bande_in_mm = (banda_somma/numero_bande)
@@ -265,9 +269,9 @@ def genera_means_ciclo10(file_path, parte_iso, parte_date, anni):
             banda_somma_10gg = np.zeros((y_size, x_size,), dtype=np.float64)
             # nome_tiff_cumulata = "1_mean_from_gribs/mar01_mar11/cum_" + str(indice) + "_" + str(anno) + ".tif"
             # nome_tiff_average = "1_mean_from_gribs/mar01_mar11/avg_" + str(indice) + "_" + str(anno) + ".tif"
-            nome_tiff_cumulata = "1_mean_from_gribs/mar22_mar31/cum_" + parte_iso + "_" + str(indice) + "_" + str(anno)\
+            nome_tiff_cumulata = "1_mean_from_gribs/apr25_may3/cum_" + parte_iso + "_" + str(indice) + "_" + str(anno)\
                                  + "_" + parte_date + ".tif"
-            nome_tiff_average = "1_mean_from_gribs/mar22_mar31/mean_" + parte_iso + "_" + str(indice) + "_" + str(anno)\
+            nome_tiff_average = "1_mean_from_gribs/apr25_may3/mean_" + parte_iso + "_" + str(indice) + "_" + str(anno)\
                                  + "_" + parte_date + ".tif"
             # print nome_tiff_average
             # print nome_tiff_cumulata
@@ -300,7 +304,8 @@ def genera_means_ciclo10(file_path, parte_iso, parte_date, anni):
             raster_cum_from_bands = None
             raster_mean_from_bands = None
 
-            conteggio += 11
+            conteggio += 1
+            # conteggio += 11
             # print
         # print conteggio
 
@@ -346,7 +351,8 @@ def analisi_raster_con_GDALNUMERICS(grib_file):
     #
 
 # FOCUS ON AFRICA
-dict = {'ymax': '40', 'xmin': '-20', 'ymin': '-40', 'xmax': '60'}
+# dict = {'ymax': '40', 'xmin': '-20', 'ymin': '-40', 'xmax': '60'}
+# dict = {'ymax': '38', 'xmin': '-26', 'ymin': '-35', 'xmax': '60'}
 #
 # # fetch_ECMWF_data("0_gribs_from_ecmwf/ellolo.grib", 'dates/req_2607_02_03_19792015.txt', dict)
 #
@@ -358,7 +364,7 @@ dict = {'ymax': '40', 'xmin': '-20', 'ymin': '-40', 'xmax': '60'}
 
 #
 # grib_file = "0_gribs_from_ecmwf/historical/afr_s24_th12_mar_2131.grib"
-grib_file = "0_gribs_from_ecmwf/historical/afr_s24_th12_mar_2231_240.grib"
+# grib_file = "0_gribs_from_ecmwf/historical/afr_s24_th12_mar_2231_240.grib"
 
 # grib_file = "frcst_46gg_21Mar.grib"
 # numero_bande = analisi_raster_con_GDALNUMERICS(grib_file)[2]
@@ -375,10 +381,13 @@ grib_file = "0_gribs_from_ecmwf/historical/afr_s24_th12_mar_2231_240.grib"
 # genera_means(raster_file, "fji", "1825_02_19792015")
 anni = []
 for anno in range(1979, 2016):
-     # if anno != 2012:
-     anni.append(anno)
-
+#      # if anno != 2012:
+      anni.append(anno)
+#
 # print anni
 # # print len(anni)
 #
-genera_means_ciclo10(grib_file, "africa", "2231_03_19792015", anni)
+
+grib_file = "0_gribs_from_ecmwf/historical/BurDjiEriEthSomSouUgaRwaTan_2706_04_05_19792016.grib"
+genera_means_ciclo10(grib_file, "eas_afr", "2503_0405_19792015", anni)
+# fetch_ECMWF_data_manuale('dates/req_2505_0405_19792016.txt', dict)

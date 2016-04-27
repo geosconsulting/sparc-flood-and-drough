@@ -1,4 +1,3 @@
-__author__ = 'fabio.lana'
 import sys
 import os
 import glob
@@ -7,7 +6,7 @@ import dbf
 
 def insert_landslide_in_postgresql(paese,lista_inserimento):
 
-    schema = 'public'
+    # schema = 'public'
     dbname = 'geonode-imports'
     user = 'geonode'
     password = 'geonode'
@@ -19,7 +18,7 @@ def insert_landslide_in_postgresql(paese,lista_inserimento):
         return e.message
     cur = conn.cursor()
 
-    sql_clean = "DELETE FROM sparc_population_month_landslide WHERE adm0_name = '" + paese + "';"
+    sql_clean = "DELETE FROM sparc_landslide_annual_population WHERE adm0_name = '" + paese + "';"
     cur.execute(sql_clean)
     conn.commit()
 
@@ -58,7 +57,7 @@ def collect_landslide_poplation_frequencies_frm_dbfs(direttorio):
                     solo_file = file.split("\\")[-1]
                     month = os.path.splitext(solo_file)[0].split("_")[1]
                     unique_id = admin_name + "-" + admin_code + "-" + month
-                    #print unique_id
+    #               print unique_id
                     try:
                         tabella = dbf.Table(file)
                         tabella.open()
@@ -107,7 +106,7 @@ def prepare_insert_statements_landslide_monthly_values(paese, adms, dct_values_a
 
             return mese
 
-        schema = 'public'
+        # schema = 'public'
         dbname = 'geonode-imports'
         user = 'geonode'
         password = 'geonode'
@@ -148,7 +147,7 @@ def prepare_insert_statements_landslide_monthly_values(paese, adms, dct_values_a
                 print e, radice, lista_proceso_conteggio
 
 
-        linee =[]
+        linee = []
         for single_adm_chiavi, single_adm_value in sorted(dct_all_admin_values.iteritems()):
             for adm2_landslide_keys, adm2_landslide_values in sorted(dct_values_annual_landslide.iteritems()):
                 val_adm = int(adm2_landslide_keys.split("-")[1])
@@ -175,13 +174,13 @@ def prepare_insert_statements_landslide_monthly_values(paese, adms, dct_values_a
 
         return lista, dct_all_admin_values,inserimento_mensili
 
-paese = 'Peru'
-PROJ_DIR = "c:/sparc/projects/landslide/"
-dirOutPaese = PROJ_DIR + paese
-
-raccogli_da_files_anno = collect_landslide_poplation_frequencies_frm_dbfs(dirOutPaese)
-adms=set()
-for chiave, valori in sorted(raccogli_da_files_anno.iteritems()):
-    adms.add(chiave.split("-")[1])
-raccolti_anno = prepare_insert_statements_landslide_monthly_values(paese, adms, raccogli_da_files_anno)
-insert_landslide_in_postgresql(paese, raccolti_anno[2])
+# paese = 'Peru'
+# PROJ_DIR = "c:/sparc/projects/landslide/"
+# dirOutPaese = PROJ_DIR + paese
+#
+# raccogli_da_files_anno = collect_landslide_poplation_frequencies_frm_dbfs(dirOutPaese)
+# adms=set()
+# for chiave, valori in sorted(raccogli_da_files_anno.iteritems()):
+#     adms.add(chiave.split("-")[1])
+# raccolti_anno = prepare_insert_statements_landslide_monthly_values(paese, adms, raccogli_da_files_anno)
+# insert_landslide_in_postgresql(paese, raccolti_anno[2])

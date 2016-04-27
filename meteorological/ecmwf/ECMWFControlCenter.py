@@ -13,7 +13,6 @@ import calculate_time_window_date
 import ecmwf_data_analysis
 import extract_total_precipitation_hres
 
-
 class AppECMWF:
 
     def __init__(self, finestra):

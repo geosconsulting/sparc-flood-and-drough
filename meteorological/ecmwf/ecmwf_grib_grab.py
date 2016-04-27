@@ -258,8 +258,6 @@ def fetch_ECMWF_ReForecast(file_output): # hdate and date and dict_area_richiest
     # })
 
 
-
-
 def genera_statistiche_banda_grib(banda, indice):
 
     print
