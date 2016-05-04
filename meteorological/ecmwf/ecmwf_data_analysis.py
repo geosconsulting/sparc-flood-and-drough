@@ -379,15 +379,15 @@ def analisi_raster_con_GDALNUMERICS(grib_file):
 
 # raster_file = "0218_0225.grib"
 # genera_means(raster_file, "fji", "1825_02_19792015")
-anni = []
-for anno in range(1979, 2016):
+#anni = []
+#for anno in range(1979, 2016):
 #      # if anno != 2012:
-      anni.append(anno)
+#      anni.append(anno)
 #
 # print anni
 # # print len(anni)
 #
 
-grib_file = "0_gribs_from_ecmwf/historical/BurDjiEriEthSomSouUgaRwaTan_2706_04_05_19792016.grib"
-genera_means_ciclo10(grib_file, "eas_afr", "2503_0405_19792015", anni)
+#grib_file = "0_gribs_from_ecmwf/historical/BurDjiEriEthSomSouUgaRwaTan_2706_04_05_19792016.grib"
+#genera_means_ciclo10(grib_file, "eas_afr", "2503_0405_19792015", anni)
 # fetch_ECMWF_data_manuale('dates/req_2505_0405_19792016.txt', dict)
