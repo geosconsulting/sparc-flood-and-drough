@@ -15,7 +15,6 @@ env.overwriteOutput = "true"
 
 class ProjectDrought(object):
 
-
     def __init__(self, dbname, user, password):
 
         self.proj_dir = "c:/sparc/projects/drought/"

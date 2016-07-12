@@ -1,0 +1,39 @@
+import pandas as pd
+from sqlalchemy import create_engine,MetaData
+from geoalchemy2 import Geometry
+
+def data_fetching(ip_in, table_name, schema):
+
+    engine_in = create_engine(r'postgresql://geonode:geonode@' + ip_in + '/geonode-imports')
+
+    try:
+        df_in_sql = pd.read_sql_table(table_name, engine_in, schema=schema, index_col='id',parse_dates={'date': '%Y-%m-%d'})
+    except Exception as e:
+        print e.message
+
+    return df_in_sql
+
+
+def data_cleaning(df,iso):
+
+    df['month'] = df['date'].dt.month
+    df['year'] = df['date'].dt.year
+    tabella_lavoro = df[df['iso3'] == iso]
+    
+    return tabella_lavoro
+
+def main(iso):
+
+    ip_in = '127.0.0.1'
+    table = 'glc20160114_wfp'
+    schema = "nasa"
+    iso = iso
+    la_tabella = data_fetching(ip_in, table, schema)
+    tabella_aggiustata = data_cleaning(la_tabella, iso)
+    print tabella_aggiustata.describe()
+    
+    incidenti_per_mese = tabella_aggiustata.groupby(['rcl_type','month'])['month'].count()
+    return incidenti_per_mese
+
+if __name__ == "__main__":
+    main()
