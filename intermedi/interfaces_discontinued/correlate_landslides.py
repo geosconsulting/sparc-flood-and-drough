@@ -227,7 +227,7 @@ def main():
     # else:
     #     pass
     #
-    # valori_precipitazione_bancaMondiale_nazionale = richieste_wordlBank(ISO)
+    # valori_precipitazione_bancaMondiale_nazionale = precipitazioneWorldBank(ISO)
     # print valori_precipitazione_bancaMondiale_nazionale[1]
     #
     # # ivaloraggi = all_plots.plot_monthly_mean_wb(ISO, valori_precipitazione_bancaMondiale_nazionale[0], "World Bank Historical Precipitation")

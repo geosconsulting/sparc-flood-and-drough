@@ -154,7 +154,7 @@ for paese in paesi:
         print correlazione
         if np.isnan(correlazione):
             correlazione = 0.00
-        #print "Per area amministrativa %s il coeffciente di preparazione_dataframes e' %.2f" % (attivo,preparazione_dataframes)
+        #print "Per area amministrativa %s il coeffciente di preparazioneDfConDatiFaoNasa e' %.2f" % (attivo,preparazioneDfConDatiFaoNasa)
 
         linea = str(adm[0]).strip() + "','" + str(adm[1]).strip() + "','" + attivo + "'," + str(correlazione)
         #print linea

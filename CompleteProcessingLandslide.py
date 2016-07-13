@@ -419,7 +419,7 @@ class ManagePostgresDBLandslide(ProjectLandslide):
 
         lista = []
         for adm in adms:
-            sql = "SELECT DISTINCT iso3, adm0_name, adm0_code, adm1_code,adm1_name, adm2_name, adm2_code FROM " \
+            sql = "SELECT DISTINCT iso3, adm0_name, adm0_code, adm1_code, adm1_name, adm2_name, adm2_code FROM " \
                   "sparc_gaul_wfp_iso WHERE adm2_code = '" + str(adm) + "' AND adm0_name = '" + self.paese + "';"
             cur.execute(sql)
             risultati = cur.fetchall()

@@ -2,7 +2,8 @@
 
 import CompleteProcessingDrought as completeDrought
 import CompleteProcessingLandslide as completeLandslide
-import Correlation_GLCFAO
+# import Correlation_GLCFAO
+import CorrelazioneIncidentiPrecipitazioneLandslide as CIP
 import FloodDataManualUpload as fdup
 import glc_splitMese
 
@@ -86,7 +87,7 @@ class AppSPARC:
         # SECTION FOR LANDSLIDES CALCULATION
         # SECTION FOR LANDSLIDES CALCULATION
         frame_landslide = Frame(finestra, height=260, width=400, bg="orange")
-        frame_landslide.place(x=305, y=180, width=140, height=135)
+        frame_landslide.place(x=305, y=180, width=140, height=155)
 
         self.button_landslide = Button(finestra,
                                        text="Landslide Assessment",
@@ -115,9 +116,9 @@ class AppSPARC:
         self.button_landslide_upload.place(x=310, y=275, width=130, height=25)
 
         self.button_landslide_upload = Button(finestra,
-                                              text="GLC by month",
+                                              text="NASA/WB by month",
                                               fg="black",
-                                              command=self.glc_mese)
+                                              command=self.landslide_mensile_NASA_WB_nazionale)
 
         self.button_landslide_upload.place(x=310, y=305, width=130, height=25)
         # SECTION FOR LANDSLIDES CALCULATION
@@ -134,7 +135,7 @@ class AppSPARC:
                 verifica = tkMessageBox.askyesno("Warning",
                                                  "Ci vediamo domani...!!" +
                                                  "Continuo?")
-                if verifica==True:
+                if verifica:
                     self.world_calc_flood()
                 else:
                     pass
@@ -145,8 +146,8 @@ class AppSPARC:
                 verifica = tkMessageBox.askyesno("Warning",
                                                  "Ci vediamo domani...!!" +
                                                  "Continuo?")
-                if verifica == True:
-                    self.world_calc_drought()
+                if verifica:
+                                    self.world_calc_drought()
                 else:
                     pass
 
@@ -347,12 +348,11 @@ class AppSPARC:
 
     def landslide_upload(self):
 
-        print self.box_value_adm0.get()
+        self.box_value_adm0.get()
 
     def landslide_correlate(self):
 
         nome_paese_per_iso = self.box_value_adm0.get()
-        #print nome_paese_per_iso
 
         if nome_paese_per_iso == "Bolivia":
             nome_paese_per_iso = "Bolivia, Plurinational State of"
@@ -374,53 +374,52 @@ class AppSPARC:
             nome_paese_per_iso = "Tanzania, United Republic of"
 
         iso3 = pycountry.countries.get(name=nome_paese_per_iso).alpha3
-        nuova_analisi = Correlation_GLCFAO.LandslideMonth(iso3)
 
-        glcs_tot = nuova_analisi.glc_events()
-        glcs_country = glcs_tot[glcs_tot['iso3'] == iso3]
-        rains_tot = nuova_analisi.fao_prec_events()
-        rains_country = rains_tot[rains_tot['iso3'] == iso3]
+        nuova_analisi_landslides = CIP.LandslideIncidentiPrecipitazioneAdmin2(iso3)
+        lst_prec_wb = nuova_analisi_landslides.precipitazioneWorldBank()
+
+        df_nasa_events = nuova_analisi_landslides.nasaEvents()
+        df_nasa_events_country = df_nasa_events[df_nasa_events['iso3'] == iso3]
+        df_emdat_events = nuova_analisi_landslides.emdatEvents()
+        df_fao_rain = nuova_analisi_landslides.faoPrecipitation()
+        df_fao_rain_country = df_fao_rain[df_fao_rain['iso3'] == iso3]
+
 
         listone_giordano = {}
-        if rains_country.empty:
-            self.area_messaggi.insert(INSERT,
-                                      "No monthly distribution of precipitation...\n")
+        if df_fao_rain.empty:
+            self.area_messaggi.insert(INSERT,"No monthly distribution of precipitation...\n")
             pass
         else:
-            for area_adm_code in rains_country.index:
+            for area_adm_code in df_fao_rain_country.index:
                 print "Processing %s " % area_adm_code
                 print "*******************************"
-                rain_adm2, lndslds_adm2 = nuova_analisi.raccolta_dati_landslides_pioggia_adm2(rains_country,
-                                                                                                  glcs_country,
-                                                                                                  area_adm_code)
+                rain_adm2, lndslds_adm2 = nuova_analisi_landslides.selezioneDatiFaoNasaSingolaAdm2(df_fao_rain_country,
+                                                                                                   df_nasa_events_country,
+                                                                                                   area_adm_code)
 
                 if len(rain_adm2.shape) == 2:
                     pass
                 else:
-                    # self.area_messaggi.insert(INSERT,area_adm_code + "\n")
-                    # solo_valori_pioggia, eventi_gcl_adm2, mesi_numerici = nuova_analisi.preparazione_dataframes(rain_adm2, lndslds_adm2)
-                    solo_valori_pioggia, eventi_gcl_adm2, mesi_numerici = nuova_analisi.preparazione_dataframes_singola_adm(
+                    solo_valori_pioggia, eventi_gcl_adm2, mesi_numerici = nuova_analisi_landslides.preparazioneDFDatiFAONASASingolaAdm(
                             rain_adm2,
                             lndslds_adm2,
                             area_adm_code)
 
                     try:
-                        associazione_pioggia_frane_normalizzata = nuova_analisi.correlazione_su_dataframe(solo_valori_pioggia,
-                                                                                   eventi_gcl_adm2,
-                                                                                   mesi_numerici)
-                        print (associazione_pioggia_frane_normalizzata)
+                        associazione_pioggia_frane_normalizzata = nuova_analisi_landslides.correlazioneDFNasaFaoNormalizzazione(solo_valori_pioggia,
+                                                                                    eventi_gcl_adm2,
+                                                                                    mesi_numerici)
+                        nuova_analisi_landslides.plotCorrelatedDataNasaFao(area_adm_code, associazione_pioggia_frane_normalizzata)
                         listato = associazione_pioggia_frane_normalizzata['eventi_norm'][:].transpose().tolist()
                         listone_giordano[area_adm_code] = listato
                     except:
                         pass
 
-        for chiave, valori in listone_giordano.items():
-            print chiave,valori
-             # if all(v == 0 for v in valori):
-             #     pass
-             # else:
-             #     myFormattedList = ['%.2f' % elem for elem in valori]
-             #     print chiave, myFormattedList
+        # for chiave, valori in listone_giordano.items():
+        #     print chiave, valori
+
+
+
 
     def landslide_national(self):
 
@@ -466,7 +465,7 @@ class AppSPARC:
 
             # corr_nazionale_trans.to_csv()
 
-    def glc_mese(self):
+    def landslide_mensile_NASA_WB_nazionale(self):
 
         nome_paese_per_iso = self.box_value_adm0.get()
 
@@ -490,9 +489,14 @@ class AppSPARC:
             nome_paese_per_iso = "Tanzania, United Republic of"
 
         iso3 = pycountry.countries.get(name=nome_paese_per_iso).alpha3
-        self.area_messaggi.insert(INSERT, iso3)
+        # self.area_messaggi.insert(INSERT, iso3)
 
         ritornati = glc_splitMese.main(iso3)
+        # ritornati['ev_n'].plot(label='Events', kind="bar", color='green')
+        #
+        # plt.legend()
+        # plt.title(self.paese_nome)
+        # plt.show()
         self.area_messaggi.insert(INSERT, ritornati)
 
 

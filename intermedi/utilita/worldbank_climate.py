@@ -57,10 +57,12 @@ def historical_analysis_damages(paese):
 
         return danni_mesi
 
-paese_iso = 'TGO'
-paese_nome = 'Togo'
+paese_iso = 'NPL'
+paese_nome = 'Nepal'
 valori_precipitazione_bancaMondiale_nazionale = richieste_wordlBank(paese_iso)
-ivaloraggi = all_plots.plot_monthly_mean_wb(paese_iso, valori_precipitazione_bancaMondiale_nazionale)
-dict_finale = historical_analysis_damages(paese_nome)
-labella_y = "Precipitation (mm) Real Time World Bank"
-all_plots.plot_monthly_danni("EM-DAT Registered Incidents", labella_y, paese_iso, ivaloraggi, dict_finale)
+print valori_precipitazione_bancaMondiale_nazionale
+ivaloraggi = all_plots.plot_monthly_mean_wb(paese_iso, valori_precipitazione_bancaMondiale_nazionale,paese_nome)
+
+# dict_finale = historical_analysis_damages(paese_nome)
+# labella_y = "Precipitation (mm) Real Time World Bank"
+# all_plots.plot_monthly_danni("EM-DAT Registered Incidents", labella_y, paese_iso, ivaloraggi, dict_finale)
